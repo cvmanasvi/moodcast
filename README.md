@@ -39,6 +39,44 @@ regression, Gaussian Naive Bayes, K-Means and TF-IDF), with no scikit-learn.
 | Movie recommendations and movie search | Unavailable (`503`); search returns no movie results | `data/movies_final.csv`, which is **not distributed and cannot be rebuilt from this repository** ([below](#movies)) |
 | Movie posters fallback and where to watch (India) | Unavailable | The movie dataset plus a `TMDB_API_KEY` |
 
+## Screenshots
+
+These were captured from the author's local setup, where the optional
+datasets were supplied locally: the music catalog, local metadata, the
+Popular Artists dataset and the movie data. A fresh clone shows the
+"unavailable" messages described above instead. Album covers and movie
+posters belong to their respective rights holders.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="screenshots/home.png" alt="MoodCast home page with the six mood options, Match my mood / Cheer me up, and the Describe your day box" width="100%"><br>
+      <sub><b>Home.</b> Pick one of six moods or describe your day. A low-confidence text result is shown as a guess ("Not sure — maybe Happy?").</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="screenshots/music.png" alt="Music page showing happy tracks ranked by the mood model" width="100%"><br>
+      <sub><b>Music.</b> Happy · Match my mood, ranked from audio features. Each track opens on Spotify; nothing plays in the app.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="screenshots/popular-artists.png" alt="Music page with Popular Artists switched on in Cheer me up mode" width="100%"><br>
+      <sub><b>Popular Artists.</b> The same page with Popular Artists on (Cheer me up), drawing from its separate local dataset.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="screenshots/movies.png" alt="Movies page showing energetic movie recommendations as poster cards, one flipped to show details" width="100%"><br>
+      <sub><b>Movies.</b> Energetic · Match my mood. Only titles with a working poster are shown; a flipped card shows the storyline and rating.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="screenshots/dashboard.png" alt="Dashboard with a mood summary, Surprise Me, and tabs for music, movies, mood insights and history" width="100%"><br>
+      <sub><b>Dashboard.</b> Mood summary with music, movies, mood insights and history tabs.</sub>
+    </td>
+    <td width="50%"></td>
+  </tr>
+</table>
+
 ## Requirements
 
 - Python 3.13. Dependencies are pinned in `requirements.txt` (Flask, pandas,
