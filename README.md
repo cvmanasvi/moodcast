@@ -41,7 +41,7 @@ regression, Gaussian Naive Bayes, K-Means and TF-IDF), with no scikit-learn.
 
 ## Screenshots
 
-These were captured from the author's local setup, where the optional
+These were captured from the local setup, where the optional
 datasets were supplied locally: the music catalog, local metadata, the
 Popular Artists dataset and the movie data. A fresh clone shows the
 "unavailable" messages described above instead. Album covers and movie
