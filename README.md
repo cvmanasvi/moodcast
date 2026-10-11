@@ -9,6 +9,17 @@ it can use.
 The ML is implemented from scratch on numpy and pandas (`src/ml/`: softmax
 regression, Gaussian Naive Bayes, K-Means and TF-IDF), with no scikit-learn.
 
+**Tech stack**
+- **Backend:** Python 3.13 and Flask (Jinja templates and a JSON API).
+- **Data and ML:** pandas and NumPy. The models are implemented from scratch
+  in `src/ml/` (no scikit-learn):
+  - a TF-IDF + softmax-regression text mood classifier;
+  - a softmax-regression audio-feature mood classifier.
+- **Frontend:** HTML, CSS and plain JavaScript (no framework).
+- **External services:** `requests` for TMDB and Spotify oEmbed lookups.
+- **Configuration:** `python-dotenv`.
+- **Tests:** pytest, plus Node.js's built-in test runner for the JavaScript.
+
 > **Datasets are not included.** This repository ships the code, tests,
 > evaluation reports and the small text-mood model. The music catalog, the
 > movie dataset and the models derived from them are not redistributed
@@ -24,7 +35,7 @@ regression, Gaussian Naive Bayes, K-Means and TF-IDF), with no scikit-learn.
 | Text mood detection (`/api/detect-mood`) | Works (model included) | — |
 | Music recommendations | Unavailable: the API answers `503` with an explanation | The 278k catalog, built locally ([below](#music-catalog-optional)) |
 | Popular Artists mode | Says its dataset isn't prepared | Its own Kaggle dataset **and** the music catalog/classifier ([below](#popular-artists-optional)) |
-| Track titles and covers | Shown for displayed tracks via Spotify's public oEmbed endpoint | Network access. Optional local metadata adds artists and search ([METADATA.md](METADATA.md)) |
+| Track titles and covers | Unavailable: no tracks are shown without the music catalog | The music catalog first. Titles and covers then come from Spotify's public oEmbed endpoint (network access). Optional local metadata adds artists and search ([METADATA.md](METADATA.md)) |
 | Movie recommendations and movie search | Unavailable (`503`); search returns no movie results | `data/movies_final.csv`, which is **not distributed and cannot be rebuilt from this repository** ([below](#movies)) |
 | Movie posters fallback and where to watch (India) | Unavailable | The movie dataset plus a `TMDB_API_KEY` |
 
@@ -64,7 +75,9 @@ Never commit real keys.
 ## Optional local data
 
 Each dataset below is downloaded or built on your machine and is gitignored.
-The licensing details and caveats for each are in [DATA.md](DATA.md).
+The licensing details and caveats for each are in [DATA.md](DATA.md). The
+source datasets are hosted on Kaggle, and downloading them may require a
+Kaggle account and signing in.
 
 ### Music catalog (optional)
 
@@ -102,8 +115,10 @@ python prepare_popular_artists.py --source path/to/spotify_tracks.csv   # or the
 python prepare_popular_artists.py --download                            # opt-in: fetches version 2 from Kaggle
 ```
 
-The input must match a pinned SHA-256, or nothing is written. Restart the app
-afterwards. See [DATA.md](DATA.md#popular-artists-dataset).
+The input must match a pinned SHA-256, or nothing is written. If `--download`
+can't fetch the file (for example because Kaggle requires signing in), the
+script stops without writing anything. In that case, download the file
+manually and use `--source`. Restart the app afterwards. See [DATA.md](DATA.md#popular-artists-dataset).
 
 ### Local music metadata (optional)
 
@@ -157,10 +172,17 @@ It has not been validated on real user text.
    - Angry and stressed have no dataset label, so they use percentile
      feature rules. Stressed is experimental.
 2. `src/recommend.py` gives each target mood a weight-proportional share of
-   the list. Single-label requests are served from 30 audio-feature cells
-   (Phase 2K). Calm-only lists exclude speech-like tracks (Phase 2K.1). Other
-   requests use a weighted sample from each target's top candidates (20 ×
-   share). Popularity plays no part in the ranking.
+   the list.
+   - **Single-label requests** (for example happy in "Match my mood") use
+     feature-cell selection. The label's tracks are split into 30
+     equal-count cells along the two main directions of their audio
+     features, and the list takes one weighted pick from the most confident
+     tracks of each cell. This spreads the list across the feature space
+     instead of clustering at its most confident extreme.
+   - **Calm-only lists** also exclude speech-like tracks (speechiness > 0.66).
+   - **Other requests** use a weighted sample from each target's top
+     candidates (20 × share).
+   - Popularity plays no part in the ranking.
 3. Results are enriched only for display: titles and covers come from oEmbed
    or the optional metadata. This step never changes ranking or membership.
 
