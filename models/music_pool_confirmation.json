@@ -1,0 +1,1723 @@
+{
+  "analysis_only": true,
+  "evaluation_date": "2026-10-09",
+  "script_sha256": "9c8c43407912316214602251df9515fd7544feae78b60d2fa9742fe54712db0b",
+  "production_configuration": {
+    "pool_multiplier": 20,
+    "weighting": "current"
+  },
+  "catalog": {
+    "path": "data\\music_catalog_278k.csv",
+    "sha256": "a261afeea3b11859cd5a8cdb65fc12402a08b8dc4e684b670c791c0dd2af9a6a",
+    "rows": 277938
+  },
+  "preregistration": {
+    "primary_strategy": "Phase 2I threshold pool, tau = 0.99, on base-label targets (sad, happy, energetic, calm) only; selection, shares and interleaving unchanged; angry/stressed keep production logic; calm candidates exclude speechiness > 0.66 (never relaxed); the existing never-shrink fallback (production pool if fewer than 20 x share pass tau) and any shortfall are counted.",
+    "sensitivity_strategy": "Same with tau = 0.95; reported against the same criteria; cannot replace the primary.",
+    "confidence_matched_baseline": "Per request, the recommender's target shares filled uniformly at random (src.music_evaluation.random_eligible_list, RandomState(21000), same draw order as earlier phases, 50 lists) from each target's population: for base-label targets, exactly the strategy's candidate pool (guarded eligibility, signal >= tau, with the same never-shrink fallback); for angry/stressed, their full current eligibility (no probability floor is invented). It measures the diversity attainable among candidates meeting the same confidence requirement, not the maximum diversity of all eligible tracks. Unrestricted random-eligible (production and guarded eligibility) and production results are secondary references.",
+    "calm_scoring": "Calm-only configuration counted once (chill/match = stressed/uplift); both aliases reported; calm compared with unguarded production on identical seeds; speech-like spread is never counted as an improvement.",
+    "paired_gate": "Lower 95% bootstrap bound > 0 versus production for happy/sad/energetic/stressed match. A component is NOT ESTABLISHED when the strategy leaves that target's selection identical to production (stressed: derived logic unchanged by pre-registration), since the comparison is then between identical algorithms. Gate = FAIL if any component fails, else NOT ESTABLISHED if any is, else PASS.",
+    "signal_gate": "Mean served classifier probability over every base-label-target slot in all 12 requests >= 0.99. The earlier all-target ranking-signal mean (which mixes in derived scores) is also reported, with mean, 5th percentile and minimum per base-label target. A mean pass is not a per-track floor.",
+    "old_results": "Phase 2H.9 and 2I results and gate statuses stand as recorded; the baseline definition here is new and is not applied to them."
+  },
+  "gates": {
+    "target_consistency": 1.0,
+    "exact_target_shares_all_lists": true,
+    "all_same_seed_identical": true,
+    "min_unique_single_target_mean_diversity": 3.3,
+    "min_sad_match_diversity": 2.0,
+    "min_unique_configs_at_least_matched_baseline": 5,
+    "paired_lower_bound_positive_for": [
+      "happy / match",
+      "sad / match",
+      "energetic / match",
+      "stressed / match"
+    ],
+    "min_mean_served_classifier_probability": 0.99,
+    "min_catalog_unique_tracks": 2000,
+    "max_mean_repeat_rate": 0.75,
+    "max_latency_p95_ms": 25.0,
+    "max_calm_speech_like_share": 0.2,
+    "calm_speech_like_not_worse_than_production": true
+  },
+  "seeds": {
+    "set": "21000..21049",
+    "runs_per_request": 50,
+    "previously_used": {
+      "tests and cold-start probes": "0..49",
+      "Phase 2H.6 API test": "2024..2024",
+      "exploratory (2H.5-2I)": "2026..2075",
+      "held-out (2H.7-2H.8)": "7000..7049",
+      "third set (2H.8.1)": "12000..12049",
+      "fourth set (2H.9)": "15000..15049",
+      "held-out (2I)": "18000..18049"
+    },
+    "disjoint_from_previously_used": true,
+    "bootstrap_rng": 0
+  },
+  "variants": {
+    "A: production": {
+      "pool": {
+        "kind": "topn",
+        "multiplier": 20
+      },
+      "calm_guard": false
+    },
+    "B: tau 0.99 + calm guard (primary)": {
+      "pool": {
+        "kind": "threshold",
+        "tau": 0.99,
+        "cap_multiplier": null
+      },
+      "calm_guard": true
+    },
+    "C: tau 0.95 + calm guard (sensitivity)": {
+      "pool": {
+        "kind": "threshold",
+        "tau": 0.95,
+        "cap_multiplier": null
+      },
+      "calm_guard": true
+    }
+  },
+  "unique_single_target_configurations": {
+    "happy:30": [
+      "happy / match"
+    ],
+    "sad:30": [
+      "sad / match"
+    ],
+    "angry:30": [
+      "angry / match"
+    ],
+    "calm:30": [
+      "chill / match",
+      "stressed / uplift"
+    ],
+    "energetic:30": [
+      "energetic / match"
+    ],
+    "stressed:30": [
+      "stressed / match"
+    ]
+  },
+  "eligibility": {
+    "sad": {
+      "eligible": 82058,
+      "eligible_after_calm_guard": 82058,
+      "guarded_eligible_with_signal_>=0.99": 20321,
+      "guarded_eligible_with_signal_>=0.95": 33811
+    },
+    "happy": {
+      "eligible": 106429,
+      "eligible_after_calm_guard": 106429,
+      "guarded_eligible_with_signal_>=0.99": 1322,
+      "guarded_eligible_with_signal_>=0.95": 19189
+    },
+    "energetic": {
+      "eligible": 47065,
+      "eligible_after_calm_guard": 47065,
+      "guarded_eligible_with_signal_>=0.99": 984,
+      "guarded_eligible_with_signal_>=0.95": 7049
+    },
+    "calm": {
+      "eligible": 42386,
+      "eligible_after_calm_guard": 42292,
+      "guarded_eligible_with_signal_>=0.99": 17592,
+      "guarded_eligible_with_signal_>=0.95": 27645,
+      "speech_like_removed": 94
+    },
+    "angry": {
+      "eligible": 5706,
+      "eligible_after_calm_guard": 5706
+    },
+    "stressed": {
+      "eligible": 8956,
+      "eligible_after_calm_guard": 8956
+    }
+  },
+  "baselines": {
+    "confidence_matched": {
+      "A: production": {
+        "happy / match": 3.1036,
+        "happy / uplift": 3.2723,
+        "sad / match": 3.3726,
+        "sad / uplift": 4.211,
+        "angry / match": 2.9045,
+        "angry / uplift": 4.2062,
+        "chill / match": 3.2212,
+        "chill / uplift": 4.3293,
+        "energetic / match": 3.1275,
+        "energetic / uplift": 3.2187,
+        "stressed / match": 2.873,
+        "stressed / uplift": 3.2212
+      },
+      "B: tau 0.99 + calm guard (primary)": {
+        "happy / match": 2.1958,
+        "happy / uplift": 3.8673,
+        "sad / match": 2.4709,
+        "sad / uplift": 4.5028,
+        "angry / match": 2.9045,
+        "angry / uplift": 4.5889,
+        "chill / match": 2.5563,
+        "chill / uplift": 4.7834,
+        "energetic / match": 2.9731,
+        "energetic / uplift": 4.0739,
+        "stressed / match": 2.873,
+        "stressed / uplift": 2.5563
+      },
+      "C: tau 0.95 + calm guard (sensitivity)": {
+        "happy / match": 2.7088,
+        "happy / uplift": 3.617,
+        "sad / match": 2.7013,
+        "sad / uplift": 4.3607,
+        "angry / match": 2.9045,
+        "angry / uplift": 4.4353,
+        "chill / match": 2.6881,
+        "chill / uplift": 4.5796,
+        "energetic / match": 2.9607,
+        "energetic / uplift": 3.7435,
+        "stressed / match": 2.873,
+        "stressed / uplift": 2.6881
+      }
+    },
+    "unrestricted": {
+      "production_eligibility": {
+        "happy / match": 3.1036,
+        "happy / uplift": 3.2723,
+        "sad / match": 3.3726,
+        "sad / uplift": 4.211,
+        "angry / match": 2.9045,
+        "angry / uplift": 4.2062,
+        "chill / match": 3.2212,
+        "chill / uplift": 4.3293,
+        "energetic / match": 3.1275,
+        "energetic / uplift": 3.2187,
+        "stressed / match": 2.873,
+        "stressed / uplift": 3.2212
+      },
+      "guarded_calm_eligibility": {
+        "happy / match": 3.1036,
+        "happy / uplift": 3.2723,
+        "sad / match": 3.3726,
+        "sad / uplift": 4.3354,
+        "angry / match": 2.9045,
+        "angry / uplift": 4.2495,
+        "chill / match": 3.1024,
+        "chill / uplift": 4.3388,
+        "energetic / match": 3.1275,
+        "energetic / uplift": 3.2187,
+        "stressed / match": 2.873,
+        "stressed / uplift": 3.1024
+      }
+    }
+  },
+  "results": {
+    "A: production": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2424,
+        "mean_repeat_rate": 0.7323,
+        "mean_diversity": 3.8465,
+        "single_target_mean_diversity": 2.8688,
+        "single_target_requests_at_least_random_eligible": 3,
+        "requests_at_least_random_eligible": 8,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9895,
+        "latency_ms": {
+          "median": 1.24,
+          "p95": 2.86,
+          "max": 4.43
+        }
+      },
+      "requests": {
+        "happy / match": {
+          "diversity": 2.12989,
+          "random_eligible_diversity": 3.1036,
+          "diversity_minus_random_eligible": -0.9737,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "mean_pairwise_jaccard": 0.0431,
+          "mean_ranking_signal_of_served": 0.9954,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.1036,
+          "unrestricted_baseline_production_eligibility": 3.1036,
+          "unrestricted_baseline_guarded_calm": 3.1036,
+          "production_diversity_same_seeds": 2.12989
+        },
+        "happy / uplift": {
+          "diversity": 4.153032,
+          "random_eligible_diversity": 3.2723,
+          "diversity_minus_random_eligible": 0.8807,
+          "unique_tracks_over_runs": 474,
+          "repeat_rate": 0.684,
+          "mean_pairwise_jaccard": 0.0384,
+          "mean_ranking_signal_of_served": 0.9964,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.2723,
+          "unrestricted_baseline_production_eligibility": 3.2723,
+          "unrestricted_baseline_guarded_calm": 3.2723,
+          "production_diversity_same_seeds": 4.153032
+        },
+        "sad / match": {
+          "diversity": 1.371662,
+          "random_eligible_diversity": 3.3726,
+          "diversity_minus_random_eligible": -2.0009,
+          "unique_tracks_over_runs": 439,
+          "repeat_rate": 0.7073,
+          "mean_pairwise_jaccard": 0.0385,
+          "mean_ranking_signal_of_served": 0.9998,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.3726,
+          "unrestricted_baseline_production_eligibility": 3.3726,
+          "unrestricted_baseline_guarded_calm": 3.3726,
+          "production_diversity_same_seeds": 1.371662
+        },
+        "sad / uplift": {
+          "diversity": 5.660162,
+          "random_eligible_diversity": 4.211,
+          "diversity_minus_random_eligible": 1.4492,
+          "unique_tracks_over_runs": 451,
+          "repeat_rate": 0.6993,
+          "mean_pairwise_jaccard": 0.039,
+          "mean_ranking_signal_of_served": 0.9974,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.211,
+          "unrestricted_baseline_production_eligibility": 4.211,
+          "unrestricted_baseline_guarded_calm": 4.3354,
+          "production_diversity_same_seeds": 5.660162
+        },
+        "angry / match": {
+          "diversity": 3.186308,
+          "random_eligible_diversity": 2.9045,
+          "diversity_minus_random_eligible": 0.2818,
+          "unique_tracks_over_runs": 456,
+          "repeat_rate": 0.696,
+          "mean_pairwise_jaccard": 0.043,
+          "mean_ranking_signal_of_served": 0.9696,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "unrestricted_baseline_production_eligibility": 2.9045,
+          "unrestricted_baseline_guarded_calm": 2.9045,
+          "production_diversity_same_seeds": 3.186308
+        },
+        "angry / uplift": {
+          "diversity": 6.106463,
+          "random_eligible_diversity": 4.2062,
+          "diversity_minus_random_eligible": 1.9003,
+          "unique_tracks_over_runs": 329,
+          "repeat_rate": 0.7807,
+          "mean_pairwise_jaccard": 0.0566,
+          "mean_ranking_signal_of_served": 0.9987,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.2062,
+          "unrestricted_baseline_production_eligibility": 4.2062,
+          "unrestricted_baseline_guarded_calm": 4.2495,
+          "production_diversity_same_seeds": 6.106463
+        },
+        "chill / match": {
+          "diversity": 4.003428,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": 0.7822,
+          "unique_tracks_over_runs": 193,
+          "repeat_rate": 0.8713,
+          "mean_pairwise_jaccard": 0.1031,
+          "mean_ranking_signal_of_served": 1.0,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.2212,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        },
+        "chill / uplift": {
+          "diversity": 5.873651,
+          "random_eligible_diversity": 4.3293,
+          "diversity_minus_random_eligible": 1.5444,
+          "unique_tracks_over_runs": 458,
+          "repeat_rate": 0.6947,
+          "mean_pairwise_jaccard": 0.0364,
+          "mean_ranking_signal_of_served": 0.9979,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.3293,
+          "unrestricted_baseline_production_eligibility": 4.3293,
+          "unrestricted_baseline_guarded_calm": 4.3388,
+          "production_diversity_same_seeds": 5.873651
+        },
+        "energetic / match": {
+          "diversity": 2.919133,
+          "random_eligible_diversity": 3.1275,
+          "diversity_minus_random_eligible": -0.2084,
+          "unique_tracks_over_runs": 462,
+          "repeat_rate": 0.692,
+          "mean_pairwise_jaccard": 0.0394,
+          "mean_ranking_signal_of_served": 0.9961,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.1275,
+          "unrestricted_baseline_production_eligibility": 3.1275,
+          "unrestricted_baseline_guarded_calm": 3.1275,
+          "production_diversity_same_seeds": 2.919133
+        },
+        "energetic / uplift": {
+          "diversity": 4.282934,
+          "random_eligible_diversity": 3.2187,
+          "diversity_minus_random_eligible": 1.0642,
+          "unique_tracks_over_runs": 463,
+          "repeat_rate": 0.6913,
+          "mean_pairwise_jaccard": 0.039,
+          "mean_ranking_signal_of_served": 0.9967,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.2187,
+          "unrestricted_baseline_production_eligibility": 3.2187,
+          "unrestricted_baseline_guarded_calm": 3.2187,
+          "production_diversity_same_seeds": 4.282934
+        },
+        "stressed / match": {
+          "diversity": 2.46794,
+          "random_eligible_diversity": 2.873,
+          "diversity_minus_random_eligible": -0.4051,
+          "unique_tracks_over_runs": 454,
+          "repeat_rate": 0.6973,
+          "mean_pairwise_jaccard": 0.0425,
+          "mean_ranking_signal_of_served": 0.9654,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "unrestricted_baseline_production_eligibility": 2.873,
+          "unrestricted_baseline_guarded_calm": 2.873,
+          "production_diversity_same_seeds": 2.46794
+        },
+        "stressed / uplift": {
+          "diversity": 4.003428,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": 0.7822,
+          "unique_tracks_over_runs": 193,
+          "repeat_rate": 0.8713,
+          "mean_pairwise_jaccard": 0.1031,
+          "mean_ranking_signal_of_served": 1.0,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.2212,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 1.67,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.24,
+          "p95_ms": 2.84,
+          "max_ms": 4.41
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.004,
+          "sad / match": 0.0,
+          "sad / uplift": 0.074,
+          "angry / match": 0.0047,
+          "angry / uplift": 0.12,
+          "chill / match": 0.188,
+          "chill / uplift": 0.08,
+          "energetic / match": 0.0107,
+          "energetic / uplift": 0.0073,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.188
+        },
+        "calm_requests": 0.188
+      },
+      "calm_containing_requests": {
+        "sad / uplift": {
+          "speech_like_share_all_served": 0.074,
+          "speech_like_share_of_calm_slots": 0.2018
+        },
+        "angry / uplift": {
+          "speech_like_share_all_served": 0.12,
+          "speech_like_share_of_calm_slots": 0.1895
+        },
+        "chill / match": {
+          "speech_like_share_all_served": 0.188,
+          "speech_like_share_of_calm_slots": 0.188
+        },
+        "chill / uplift": {
+          "speech_like_share_all_served": 0.08,
+          "speech_like_share_of_calm_slots": 0.1982
+        },
+        "stressed / uplift": {
+          "speech_like_share_all_served": 0.188,
+          "speech_like_share_of_calm_slots": 0.188
+        }
+      },
+      "served_confidence": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean": 0.9998,
+            "p5": 0.9998,
+            "min": 0.9997,
+            "share_below_0.99": 0.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean": 0.9959,
+            "p5": 0.994,
+            "min": 0.9928,
+            "share_below_0.99": 0.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean": 0.9966,
+            "p5": 0.9942,
+            "min": 0.9927,
+            "share_below_0.99": 0.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean": 1.0,
+            "p5": 1.0,
+            "min": 0.9999,
+            "share_below_0.99": 0.0
+          }
+        },
+        "mean_all_base_label_slots": 0.9978,
+        "share_of_slots_below_0.99": 0.0
+      },
+      "fallbacks": {},
+      "shortfall_slots": {},
+      "pool_size_by_target": {},
+      "unique_single_target_configurations": {
+        "happy:30": {
+          "requests": [
+            "happy / match"
+          ],
+          "diversity": 2.12989,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 3.1036,
+          "at_least_baseline": false
+        },
+        "sad:30": {
+          "requests": [
+            "sad / match"
+          ],
+          "diversity": 1.371662,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 3.3726,
+          "at_least_baseline": false
+        },
+        "angry:30": {
+          "requests": [
+            "angry / match"
+          ],
+          "diversity": 3.186308,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "at_least_baseline": true
+        },
+        "calm:30": {
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "diversity": 4.003428,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 3.2212,
+          "at_least_baseline": true
+        },
+        "energetic:30": {
+          "requests": [
+            "energetic / match"
+          ],
+          "diversity": 2.919133,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 3.1275,
+          "at_least_baseline": false
+        },
+        "stressed:30": {
+          "requests": [
+            "stressed / match"
+          ],
+          "diversity": 2.46794,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "at_least_baseline": false
+        }
+      },
+      "unique_single_target_mean_diversity": 2.6797,
+      "unique_configs_at_least_confidence_matched_baseline": "2/6",
+      "paired_gate_components": {
+        "happy / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "production is the reference"
+        },
+        "sad / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "production is the reference"
+        },
+        "energetic / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "production is the reference"
+        },
+        "stressed / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "production is the reference"
+        }
+      },
+      "calm_speech_like_vs_production": {
+        "variant": 0.188,
+        "production_same_seeds": 0.188
+      },
+      "gates": {
+        "target_consistency_100": "PASS",
+        "exact_target_shares": "PASS",
+        "deterministic": "PASS",
+        "unique_config_mean_diversity_>=3.3": "FAIL",
+        "sad_match_diversity_>=2.0": "FAIL",
+        ">=5_of_6_at_least_confidence_matched_baseline": "FAIL",
+        "paired_lower_bounds_>0": "NOT ESTABLISHED",
+        "mean_served_classifier_probability_>=0.99": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_not_worse_than_production": "PASS"
+      }
+    },
+    "B: tau 0.99 + calm guard (primary)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 5123,
+        "mean_repeat_rate": 0.3251,
+        "mean_diversity": 3.359,
+        "single_target_mean_diversity": 2.5775,
+        "single_target_requests_at_least_random_eligible": 1,
+        "requests_at_least_random_eligible": 6,
+        "mean_ranking_signal_of_served": 0.9912,
+        "single_target_mean_ranking_signal": 0.9883,
+        "latency_ms": {
+          "median": 1.78,
+          "p95": 3.47,
+          "max": 4.53
+        }
+      },
+      "requests": {
+        "happy / match": {
+          "diversity": 2.175543,
+          "random_eligible_diversity": 3.1036,
+          "diversity_minus_random_eligible": -0.9281,
+          "unique_tracks_over_runs": 756,
+          "repeat_rate": 0.496,
+          "mean_pairwise_jaccard": 0.0186,
+          "mean_ranking_signal_of_served": 0.994,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.1958,
+          "unrestricted_baseline_production_eligibility": 3.1036,
+          "unrestricted_baseline_guarded_calm": 3.1036,
+          "production_diversity_same_seeds": 2.12989
+        },
+        "happy / uplift": {
+          "diversity": 3.94657,
+          "random_eligible_diversity": 3.2723,
+          "diversity_minus_random_eligible": 0.6743,
+          "unique_tracks_over_runs": 993,
+          "repeat_rate": 0.338,
+          "mean_pairwise_jaccard": 0.0102,
+          "mean_ranking_signal_of_served": 0.9944,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.8673,
+          "unrestricted_baseline_production_eligibility": 3.2723,
+          "unrestricted_baseline_guarded_calm": 3.2723,
+          "production_diversity_same_seeds": 4.153032
+        },
+        "sad / match": {
+          "diversity": 2.429376,
+          "random_eligible_diversity": 3.3726,
+          "diversity_minus_random_eligible": -0.9432,
+          "unique_tracks_over_runs": 1443,
+          "repeat_rate": 0.038,
+          "mean_pairwise_jaccard": 0.0008,
+          "mean_ranking_signal_of_served": 0.998,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.4709,
+          "unrestricted_baseline_production_eligibility": 3.3726,
+          "unrestricted_baseline_guarded_calm": 3.3726,
+          "production_diversity_same_seeds": 1.371662
+        },
+        "sad / uplift": {
+          "diversity": 4.555689,
+          "random_eligible_diversity": 4.211,
+          "diversity_minus_random_eligible": 0.3447,
+          "unique_tracks_over_runs": 1144,
+          "repeat_rate": 0.2373,
+          "mean_pairwise_jaccard": 0.0075,
+          "mean_ranking_signal_of_served": 0.9954,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.5028,
+          "unrestricted_baseline_production_eligibility": 4.211,
+          "unrestricted_baseline_guarded_calm": 4.3354,
+          "production_diversity_same_seeds": 5.660162
+        },
+        "angry / match": {
+          "diversity": 3.186308,
+          "random_eligible_diversity": 2.9045,
+          "diversity_minus_random_eligible": 0.2818,
+          "unique_tracks_over_runs": 456,
+          "repeat_rate": 0.696,
+          "mean_pairwise_jaccard": 0.043,
+          "mean_ranking_signal_of_served": 0.9696,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "unrestricted_baseline_production_eligibility": 2.9045,
+          "unrestricted_baseline_guarded_calm": 2.9045,
+          "production_diversity_same_seeds": 3.186308
+        },
+        "angry / uplift": {
+          "diversity": 4.661996,
+          "random_eligible_diversity": 4.2062,
+          "diversity_minus_random_eligible": 0.4558,
+          "unique_tracks_over_runs": 1353,
+          "repeat_rate": 0.098,
+          "mean_pairwise_jaccard": 0.0025,
+          "mean_ranking_signal_of_served": 0.9965,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.5889,
+          "unrestricted_baseline_production_eligibility": 4.2062,
+          "unrestricted_baseline_guarded_calm": 4.2495,
+          "production_diversity_same_seeds": 6.106463
+        },
+        "chill / match": {
+          "diversity": 2.438004,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": -0.7832,
+          "unique_tracks_over_runs": 1438,
+          "repeat_rate": 0.0413,
+          "mean_pairwise_jaccard": 0.0009,
+          "mean_ranking_signal_of_served": 0.9979,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.5563,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        },
+        "chill / uplift": {
+          "diversity": 4.925903,
+          "random_eligible_diversity": 4.3293,
+          "diversity_minus_random_eligible": 0.5966,
+          "unique_tracks_over_runs": 1072,
+          "repeat_rate": 0.2853,
+          "mean_pairwise_jaccard": 0.0098,
+          "mean_ranking_signal_of_served": 0.9961,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.7834,
+          "unrestricted_baseline_production_eligibility": 4.3293,
+          "unrestricted_baseline_guarded_calm": 4.3388,
+          "production_diversity_same_seeds": 5.873651
+        },
+        "energetic / match": {
+          "diversity": 2.907563,
+          "random_eligible_diversity": 3.1275,
+          "diversity_minus_random_eligible": -0.2199,
+          "unique_tracks_over_runs": 646,
+          "repeat_rate": 0.5693,
+          "mean_pairwise_jaccard": 0.0244,
+          "mean_ranking_signal_of_served": 0.995,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.9731,
+          "unrestricted_baseline_production_eligibility": 3.1275,
+          "unrestricted_baseline_guarded_calm": 3.1275,
+          "production_diversity_same_seeds": 2.919133
+        },
+        "energetic / uplift": {
+          "diversity": 4.174716,
+          "random_eligible_diversity": 3.2187,
+          "diversity_minus_random_eligible": 0.956,
+          "unique_tracks_over_runs": 954,
+          "repeat_rate": 0.364,
+          "mean_pairwise_jaccard": 0.0119,
+          "mean_ranking_signal_of_served": 0.9946,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.0739,
+          "unrestricted_baseline_production_eligibility": 3.2187,
+          "unrestricted_baseline_guarded_calm": 3.2187,
+          "production_diversity_same_seeds": 4.282934
+        },
+        "stressed / match": {
+          "diversity": 2.46794,
+          "random_eligible_diversity": 2.873,
+          "diversity_minus_random_eligible": -0.4051,
+          "unique_tracks_over_runs": 454,
+          "repeat_rate": 0.6973,
+          "mean_pairwise_jaccard": 0.0425,
+          "mean_ranking_signal_of_served": 0.9654,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "unrestricted_baseline_production_eligibility": 2.873,
+          "unrestricted_baseline_guarded_calm": 2.873,
+          "production_diversity_same_seeds": 2.46794
+        },
+        "stressed / uplift": {
+          "diversity": 2.438004,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": -0.7832,
+          "unique_tracks_over_runs": 1438,
+          "repeat_rate": 0.0413,
+          "mean_pairwise_jaccard": 0.0009,
+          "mean_ranking_signal_of_served": 0.9979,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.5563,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 1.98,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.76,
+          "p95_ms": 3.48,
+          "max_ms": 4.52
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0013,
+          "happy / uplift": 0.004,
+          "sad / match": 0.0,
+          "sad / uplift": 0.0007,
+          "angry / match": 0.0047,
+          "angry / uplift": 0.0007,
+          "chill / match": 0.0,
+          "chill / uplift": 0.008,
+          "energetic / match": 0.0113,
+          "energetic / uplift": 0.0087,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "calm_containing_requests": {
+        "sad / uplift": {
+          "speech_like_share_all_served": 0.0007,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "angry / uplift": {
+          "speech_like_share_all_served": 0.0007,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "chill / match": {
+          "speech_like_share_all_served": 0.0,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "chill / uplift": {
+          "speech_like_share_all_served": 0.008,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "stressed / uplift": {
+          "speech_like_share_all_served": 0.0,
+          "speech_like_share_of_calm_slots": 0.0
+        }
+      },
+      "served_confidence": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean": 0.998,
+            "p5": 0.9939,
+            "min": 0.9909,
+            "share_below_0.99": 0.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean": 0.994,
+            "p5": 0.9911,
+            "min": 0.9902,
+            "share_below_0.99": 0.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean": 0.995,
+            "p5": 0.9915,
+            "min": 0.9902,
+            "share_below_0.99": 0.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean": 0.9979,
+            "p5": 0.9935,
+            "min": 0.9904,
+            "share_below_0.99": 0.0
+          }
+        },
+        "mean_all_base_label_slots": 0.996,
+        "share_of_slots_below_0.99": 0.0
+      },
+      "fallbacks": {
+        "happy": 0,
+        "energetic": 0,
+        "sad": 0,
+        "calm": 0,
+        "angry": 0,
+        "stressed": 0
+      },
+      "shortfall_slots": {},
+      "pool_size_by_target": {
+        "happy": {
+          "min": 1322,
+          "median": 1322,
+          "max": 1322
+        },
+        "energetic": {
+          "min": 984,
+          "median": 984,
+          "max": 984
+        },
+        "sad": {
+          "min": 20321,
+          "median": 20321,
+          "max": 20321
+        },
+        "calm": {
+          "min": 17592,
+          "median": 17592,
+          "max": 17592
+        },
+        "angry": {
+          "min": 600,
+          "median": 600,
+          "max": 600
+        },
+        "stressed": {
+          "min": 600,
+          "median": 600,
+          "max": 600
+        }
+      },
+      "paired_vs_production": {
+        "happy / match": {
+          "mean_diff": 0.0457,
+          "bootstrap_95": [
+            -0.0168,
+            0.1064
+          ],
+          "runs_where_b_more_diverse": 30
+        },
+        "happy / uplift": {
+          "mean_diff": -0.2065,
+          "bootstrap_95": [
+            -0.2717,
+            -0.1374
+          ],
+          "runs_where_b_more_diverse": 9
+        },
+        "sad / match": {
+          "mean_diff": 1.0577,
+          "bootstrap_95": [
+            0.9796,
+            1.1416
+          ],
+          "runs_where_b_more_diverse": 50
+        },
+        "sad / uplift": {
+          "mean_diff": -1.1045,
+          "bootstrap_95": [
+            -1.1743,
+            -1.0368
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "angry / match": {
+          "mean_diff": 0.0,
+          "bootstrap_95": [
+            0.0,
+            0.0
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "angry / uplift": {
+          "mean_diff": -1.4445,
+          "bootstrap_95": [
+            -1.5492,
+            -1.3408
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "chill / match": {
+          "mean_diff": -1.5654,
+          "bootstrap_95": [
+            -1.6924,
+            -1.4355
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "chill / uplift": {
+          "mean_diff": -0.9477,
+          "bootstrap_95": [
+            -1.0227,
+            -0.8743
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "energetic / match": {
+          "mean_diff": -0.0116,
+          "bootstrap_95": [
+            -0.1157,
+            0.1016
+          ],
+          "runs_where_b_more_diverse": 21
+        },
+        "energetic / uplift": {
+          "mean_diff": -0.1082,
+          "bootstrap_95": [
+            -0.1786,
+            -0.0413
+          ],
+          "runs_where_b_more_diverse": 18
+        },
+        "stressed / match": {
+          "mean_diff": 0.0,
+          "bootstrap_95": [
+            0.0,
+            0.0
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "stressed / uplift": {
+          "mean_diff": -1.5654,
+          "bootstrap_95": [
+            -1.693,
+            -1.4279
+          ],
+          "runs_where_b_more_diverse": 0
+        }
+      },
+      "unique_single_target_configurations": {
+        "happy:30": {
+          "requests": [
+            "happy / match"
+          ],
+          "diversity": 2.175543,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.1958,
+          "at_least_baseline": false
+        },
+        "sad:30": {
+          "requests": [
+            "sad / match"
+          ],
+          "diversity": 2.429376,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.4709,
+          "at_least_baseline": false
+        },
+        "angry:30": {
+          "requests": [
+            "angry / match"
+          ],
+          "diversity": 3.186308,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "at_least_baseline": true
+        },
+        "calm:30": {
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "diversity": 2.438004,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.5563,
+          "at_least_baseline": false
+        },
+        "energetic:30": {
+          "requests": [
+            "energetic / match"
+          ],
+          "diversity": 2.907563,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.9731,
+          "at_least_baseline": false
+        },
+        "stressed:30": {
+          "requests": [
+            "stressed / match"
+          ],
+          "diversity": 2.46794,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "at_least_baseline": false
+        }
+      },
+      "unique_single_target_mean_diversity": 2.6008,
+      "unique_configs_at_least_confidence_matched_baseline": "1/6",
+      "paired_gate_components": {
+        "happy / match": {
+          "status": "FAIL",
+          "why": "lower bound -0.0168"
+        },
+        "sad / match": {
+          "status": "PASS",
+          "why": "lower bound 0.9796"
+        },
+        "energetic / match": {
+          "status": "FAIL",
+          "why": "lower bound -0.1157"
+        },
+        "stressed / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "selection for this derived target is identical to production by pre-registration"
+        }
+      },
+      "calm_speech_like_vs_production": {
+        "variant": 0.0,
+        "production_same_seeds": 0.188
+      },
+      "gates": {
+        "target_consistency_100": "PASS",
+        "exact_target_shares": "PASS",
+        "deterministic": "PASS",
+        "unique_config_mean_diversity_>=3.3": "FAIL",
+        "sad_match_diversity_>=2.0": "PASS",
+        ">=5_of_6_at_least_confidence_matched_baseline": "FAIL",
+        "paired_lower_bounds_>0": "FAIL",
+        "mean_served_classifier_probability_>=0.99": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_not_worse_than_production": "PASS"
+      }
+    },
+    "C: tau 0.95 + calm guard (sensitivity)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 6494,
+        "mean_repeat_rate": 0.1537,
+        "mean_diversity": 3.3703,
+        "single_target_mean_diversity": 2.74,
+        "single_target_requests_at_least_random_eligible": 1,
+        "requests_at_least_random_eligible": 6,
+        "mean_ranking_signal_of_served": 0.9826,
+        "single_target_mean_ranking_signal": 0.982,
+        "latency_ms": {
+          "median": 1.85,
+          "p95": 3.9,
+          "max": 7.72
+        }
+      },
+      "requests": {
+        "happy / match": {
+          "diversity": 2.637659,
+          "random_eligible_diversity": 3.1036,
+          "diversity_minus_random_eligible": -0.4659,
+          "unique_tracks_over_runs": 1428,
+          "repeat_rate": 0.048,
+          "mean_pairwise_jaccard": 0.0011,
+          "mean_ranking_signal_of_served": 0.9788,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.7088,
+          "unrestricted_baseline_production_eligibility": 3.1036,
+          "unrestricted_baseline_guarded_calm": 3.1036,
+          "production_diversity_same_seeds": 2.12989
+        },
+        "happy / uplift": {
+          "diversity": 3.723994,
+          "random_eligible_diversity": 3.2723,
+          "diversity_minus_random_eligible": 0.4517,
+          "unique_tracks_over_runs": 1452,
+          "repeat_rate": 0.032,
+          "mean_pairwise_jaccard": 0.0007,
+          "mean_ranking_signal_of_served": 0.9797,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.617,
+          "unrestricted_baseline_production_eligibility": 3.2723,
+          "unrestricted_baseline_guarded_calm": 3.2723,
+          "production_diversity_same_seeds": 4.153032
+        },
+        "sad / match": {
+          "diversity": 2.644619,
+          "random_eligible_diversity": 3.3726,
+          "diversity_minus_random_eligible": -0.728,
+          "unique_tracks_over_runs": 1463,
+          "repeat_rate": 0.0247,
+          "mean_pairwise_jaccard": 0.0005,
+          "mean_ranking_signal_of_served": 0.9927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.7013,
+          "unrestricted_baseline_production_eligibility": 3.3726,
+          "unrestricted_baseline_guarded_calm": 3.3726,
+          "production_diversity_same_seeds": 1.371662
+        },
+        "sad / uplift": {
+          "diversity": 4.538783,
+          "random_eligible_diversity": 4.211,
+          "diversity_minus_random_eligible": 0.3278,
+          "unique_tracks_over_runs": 1473,
+          "repeat_rate": 0.018,
+          "mean_pairwise_jaccard": 0.0004,
+          "mean_ranking_signal_of_served": 0.9841,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.3607,
+          "unrestricted_baseline_production_eligibility": 4.211,
+          "unrestricted_baseline_guarded_calm": 4.3354,
+          "production_diversity_same_seeds": 5.660162
+        },
+        "angry / match": {
+          "diversity": 3.186308,
+          "random_eligible_diversity": 2.9045,
+          "diversity_minus_random_eligible": 0.2818,
+          "unique_tracks_over_runs": 456,
+          "repeat_rate": 0.696,
+          "mean_pairwise_jaccard": 0.043,
+          "mean_ranking_signal_of_served": 0.9696,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "unrestricted_baseline_production_eligibility": 2.9045,
+          "unrestricted_baseline_guarded_calm": 2.9045,
+          "production_diversity_same_seeds": 3.186308
+        },
+        "angry / uplift": {
+          "diversity": 4.513267,
+          "random_eligible_diversity": 4.2062,
+          "diversity_minus_random_eligible": 0.3071,
+          "unique_tracks_over_runs": 1472,
+          "repeat_rate": 0.0187,
+          "mean_pairwise_jaccard": 0.0004,
+          "mean_ranking_signal_of_served": 0.9878,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.4353,
+          "unrestricted_baseline_production_eligibility": 4.2062,
+          "unrestricted_baseline_guarded_calm": 4.2495,
+          "production_diversity_same_seeds": 6.106463
+        },
+        "chill / match": {
+          "diversity": 2.654197,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": -0.567,
+          "unique_tracks_over_runs": 1457,
+          "repeat_rate": 0.0287,
+          "mean_pairwise_jaccard": 0.0006,
+          "mean_ranking_signal_of_served": 0.9931,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.6881,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        },
+        "chill / uplift": {
+          "diversity": 4.6877,
+          "random_eligible_diversity": 4.3293,
+          "diversity_minus_random_eligible": 0.3584,
+          "unique_tracks_over_runs": 1412,
+          "repeat_rate": 0.0587,
+          "mean_pairwise_jaccard": 0.0014,
+          "mean_ranking_signal_of_served": 0.9857,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 4.5796,
+          "unrestricted_baseline_production_eligibility": 4.3293,
+          "unrestricted_baseline_guarded_calm": 4.3388,
+          "production_diversity_same_seeds": 5.873651
+        },
+        "energetic / match": {
+          "diversity": 2.934811,
+          "random_eligible_diversity": 3.1275,
+          "diversity_minus_random_eligible": -0.1927,
+          "unique_tracks_over_runs": 1304,
+          "repeat_rate": 0.1307,
+          "mean_pairwise_jaccard": 0.0031,
+          "mean_ranking_signal_of_served": 0.9813,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.9607,
+          "unrestricted_baseline_production_eligibility": 3.1275,
+          "unrestricted_baseline_guarded_calm": 3.1275,
+          "production_diversity_same_seeds": 2.919133
+        },
+        "energetic / uplift": {
+          "diversity": 3.800352,
+          "random_eligible_diversity": 3.2187,
+          "diversity_minus_random_eligible": 0.5817,
+          "unique_tracks_over_runs": 1406,
+          "repeat_rate": 0.0627,
+          "mean_pairwise_jaccard": 0.0015,
+          "mean_ranking_signal_of_served": 0.9804,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 3.7435,
+          "unrestricted_baseline_production_eligibility": 3.2187,
+          "unrestricted_baseline_guarded_calm": 3.2187,
+          "production_diversity_same_seeds": 4.282934
+        },
+        "stressed / match": {
+          "diversity": 2.46794,
+          "random_eligible_diversity": 2.873,
+          "diversity_minus_random_eligible": -0.4051,
+          "unique_tracks_over_runs": 454,
+          "repeat_rate": 0.6973,
+          "mean_pairwise_jaccard": 0.0425,
+          "mean_ranking_signal_of_served": 0.9654,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "unrestricted_baseline_production_eligibility": 2.873,
+          "unrestricted_baseline_guarded_calm": 2.873,
+          "production_diversity_same_seeds": 2.46794
+        },
+        "stressed / uplift": {
+          "diversity": 2.654197,
+          "random_eligible_diversity": 3.2212,
+          "diversity_minus_random_eligible": -0.567,
+          "unique_tracks_over_runs": 1457,
+          "repeat_rate": 0.0287,
+          "mean_pairwise_jaccard": 0.0006,
+          "mean_ranking_signal_of_served": 0.9931,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0,
+          "same_seed_identical": true,
+          "confidence_matched_baseline": 2.6881,
+          "unrestricted_baseline_production_eligibility": 3.2212,
+          "unrestricted_baseline_guarded_calm": 3.1024,
+          "production_diversity_same_seeds": 4.003428
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.87,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.84,
+          "p95_ms": 3.9,
+          "max_ms": 7.71
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0113,
+          "happy / uplift": 0.0093,
+          "sad / match": 0.0,
+          "sad / uplift": 0.008,
+          "angry / match": 0.0047,
+          "angry / uplift": 0.0033,
+          "chill / match": 0.0,
+          "chill / uplift": 0.0013,
+          "energetic / match": 0.0027,
+          "energetic / uplift": 0.0047,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "calm_containing_requests": {
+        "sad / uplift": {
+          "speech_like_share_all_served": 0.008,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "angry / uplift": {
+          "speech_like_share_all_served": 0.0033,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "chill / match": {
+          "speech_like_share_all_served": 0.0,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "chill / uplift": {
+          "speech_like_share_all_served": 0.0013,
+          "speech_like_share_of_calm_slots": 0.0
+        },
+        "stressed / uplift": {
+          "speech_like_share_all_served": 0.0,
+          "speech_like_share_of_calm_slots": 0.0
+        }
+      },
+      "served_confidence": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean": 0.9927,
+            "p5": 0.9731,
+            "min": 0.9538,
+            "share_below_0.99": 0.2553
+          },
+          "happy": {
+            "slots": 4500,
+            "mean": 0.9788,
+            "p5": 0.96,
+            "min": 0.9509,
+            "share_below_0.99": 0.8493
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean": 0.9813,
+            "p5": 0.961,
+            "min": 0.9508,
+            "share_below_0.99": 0.7532
+          },
+          "calm": {
+            "slots": 5050,
+            "mean": 0.9931,
+            "p5": 0.9729,
+            "min": 0.9525,
+            "share_below_0.99": 0.2347
+          }
+        },
+        "mean_all_base_label_slots": 0.9857,
+        "share_of_slots_below_0.99": 0.5577
+      },
+      "fallbacks": {
+        "happy": 0,
+        "energetic": 0,
+        "sad": 0,
+        "calm": 0,
+        "angry": 0,
+        "stressed": 0
+      },
+      "shortfall_slots": {},
+      "pool_size_by_target": {
+        "happy": {
+          "min": 19189,
+          "median": 19189,
+          "max": 19189
+        },
+        "energetic": {
+          "min": 7049,
+          "median": 7049,
+          "max": 7049
+        },
+        "sad": {
+          "min": 33811,
+          "median": 33811,
+          "max": 33811
+        },
+        "calm": {
+          "min": 27645,
+          "median": 27645,
+          "max": 27645
+        },
+        "angry": {
+          "min": 600,
+          "median": 600,
+          "max": 600
+        },
+        "stressed": {
+          "min": 600,
+          "median": 600,
+          "max": 600
+        }
+      },
+      "paired_vs_production": {
+        "happy / match": {
+          "mean_diff": 0.5078,
+          "bootstrap_95": [
+            0.4237,
+            0.5902
+          ],
+          "runs_where_b_more_diverse": 49
+        },
+        "happy / uplift": {
+          "mean_diff": -0.429,
+          "bootstrap_95": [
+            -0.499,
+            -0.3541
+          ],
+          "runs_where_b_more_diverse": 3
+        },
+        "sad / match": {
+          "mean_diff": 1.273,
+          "bootstrap_95": [
+            1.1928,
+            1.3531
+          ],
+          "runs_where_b_more_diverse": 50
+        },
+        "sad / uplift": {
+          "mean_diff": -1.1214,
+          "bootstrap_95": [
+            -1.2079,
+            -1.035
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "angry / match": {
+          "mean_diff": 0.0,
+          "bootstrap_95": [
+            0.0,
+            0.0
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "angry / uplift": {
+          "mean_diff": -1.5932,
+          "bootstrap_95": [
+            -1.6857,
+            -1.4963
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "chill / match": {
+          "mean_diff": -1.3492,
+          "bootstrap_95": [
+            -1.5028,
+            -1.2229
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "chill / uplift": {
+          "mean_diff": -1.186,
+          "bootstrap_95": [
+            -1.2798,
+            -1.0963
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "energetic / match": {
+          "mean_diff": 0.0157,
+          "bootstrap_95": [
+            -0.0868,
+            0.119
+          ],
+          "runs_where_b_more_diverse": 32
+        },
+        "energetic / uplift": {
+          "mean_diff": -0.4826,
+          "bootstrap_95": [
+            -0.5761,
+            -0.3938
+          ],
+          "runs_where_b_more_diverse": 4
+        },
+        "stressed / match": {
+          "mean_diff": 0.0,
+          "bootstrap_95": [
+            0.0,
+            0.0
+          ],
+          "runs_where_b_more_diverse": 0
+        },
+        "stressed / uplift": {
+          "mean_diff": -1.3492,
+          "bootstrap_95": [
+            -1.4912,
+            -1.2059
+          ],
+          "runs_where_b_more_diverse": 0
+        }
+      },
+      "unique_single_target_configurations": {
+        "happy:30": {
+          "requests": [
+            "happy / match"
+          ],
+          "diversity": 2.637659,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.7088,
+          "at_least_baseline": false
+        },
+        "sad:30": {
+          "requests": [
+            "sad / match"
+          ],
+          "diversity": 2.644619,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.7013,
+          "at_least_baseline": false
+        },
+        "angry:30": {
+          "requests": [
+            "angry / match"
+          ],
+          "diversity": 3.186308,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.9045,
+          "at_least_baseline": true
+        },
+        "calm:30": {
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "diversity": 2.654197,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.6881,
+          "at_least_baseline": false
+        },
+        "energetic:30": {
+          "requests": [
+            "energetic / match"
+          ],
+          "diversity": 2.934811,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.9607,
+          "at_least_baseline": false
+        },
+        "stressed:30": {
+          "requests": [
+            "stressed / match"
+          ],
+          "diversity": 2.46794,
+          "aliases_identical": true,
+          "confidence_matched_baseline": 2.873,
+          "at_least_baseline": false
+        }
+      },
+      "unique_single_target_mean_diversity": 2.7543,
+      "unique_configs_at_least_confidence_matched_baseline": "1/6",
+      "paired_gate_components": {
+        "happy / match": {
+          "status": "PASS",
+          "why": "lower bound 0.4237"
+        },
+        "sad / match": {
+          "status": "PASS",
+          "why": "lower bound 1.1928"
+        },
+        "energetic / match": {
+          "status": "FAIL",
+          "why": "lower bound -0.0868"
+        },
+        "stressed / match": {
+          "status": "NOT ESTABLISHED",
+          "why": "selection for this derived target is identical to production by pre-registration"
+        }
+      },
+      "calm_speech_like_vs_production": {
+        "variant": 0.0,
+        "production_same_seeds": 0.188
+      },
+      "gates": {
+        "target_consistency_100": "PASS",
+        "exact_target_shares": "PASS",
+        "deterministic": "PASS",
+        "unique_config_mean_diversity_>=3.3": "FAIL",
+        "sad_match_diversity_>=2.0": "PASS",
+        ">=5_of_6_at_least_confidence_matched_baseline": "FAIL",
+        "paired_lower_bounds_>0": "FAIL",
+        "mean_served_classifier_probability_>=0.99": "FAIL",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_not_worse_than_production": "PASS"
+      }
+    }
+  },
+  "cold_start": {
+    "A: production": {
+      "first_ms": {
+        "median_ms": 2.06,
+        "max_ms": 2.22
+      },
+      "second_ms": {
+        "median_ms": 1.17,
+        "max_ms": 1.29
+      },
+      "tenth_ms": {
+        "median_ms": 1.08,
+        "max_ms": 1.19
+      }
+    },
+    "B: tau 0.99 + calm guard (primary)": {
+      "first_ms": {
+        "median_ms": 2.8,
+        "max_ms": 3.15
+      },
+      "second_ms": {
+        "median_ms": 1.86,
+        "max_ms": 1.99
+      },
+      "tenth_ms": {
+        "median_ms": 1.51,
+        "max_ms": 1.6
+      }
+    },
+    "C: tau 0.95 + calm guard (sensitivity)": {
+      "first_ms": {
+        "median_ms": 2.88,
+        "max_ms": 2.98
+      },
+      "second_ms": {
+        "median_ms": 1.87,
+        "max_ms": 2.26
+      },
+      "tenth_ms": {
+        "median_ms": 1.51,
+        "max_ms": 1.93
+      }
+    }
+  },
+  "notes": [
+    "Diversity is feature-space diversity (mean pairwise distance in the 9 z-scored audio features), not listener-perceived variety.",
+    "Bootstrap intervals resample one request's 50 runs on one catalog: sampling variability only, no listener-level or cross-user significance.",
+    "The confidence-matched baseline is new in this phase; Phase 2H.9 and 2I gate statuses are unchanged.",
+    "Precision/NDCG are omitted: relevance is the eligibility definition.",
+    "Latency is machine-dependent; cold start uses fresh interpreters on sad/match."
+  ],
+  "runtime_s": 55.9
+}

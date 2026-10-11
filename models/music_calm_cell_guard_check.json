@@ -1,0 +1,3158 @@
+{
+  "analysis_only": true,
+  "evaluation_date": "2026-10-09",
+  "script_sha256": "c3a20e884e1b24a1091f9acf95848aa4b81d4439150ed1e34a4715699615833c",
+  "source_artifact_sha256": {
+    "catalog": "a261afeea3b11859cd5a8cdb65fc12402a08b8dc4e684b670c791c0dd2af9a6a",
+    "classifier": "09b653bfd0cf48c44df1ad2d2d07c851bd617950b19a1546573eeb0f607540d1",
+    "src_recommend": "6fee36331826c390f66c80208820399f674654bb72af30bb3972e48506465818"
+  },
+  "production_configuration": {
+    "pool_multiplier": 20,
+    "feature_cell_targets": [
+      "happy",
+      "sad",
+      "calm",
+      "energetic"
+    ],
+    "calm_cell_speechiness_max": 0.66
+  },
+  "preregistration": {
+    "primary_comparison": "K1 against K, paired on identical seeds: calm-only configuration diversity and speech-like share, plus every other configuration (expected identical).",
+    "prior_gates": "The Phase 2J.1 gates are reported unchanged for K1 against B, the frame used for the Phase 2K check. No gate is added, removed or changed.",
+    "interpretation_fixed_in_advance": "Calm diversity of the unguarded routes (B ~4.06, K ~4.71) is inflated by speech-like tracks (Phase 2H.8.1, 2K). A lower guarded calm diversity is therefore reported as the removal of that inflation, not as a regression in variety, and guarded calm diversity is not claimed as a gain over B.",
+    "scope_of_claims": "K1 matches the Phase 2J.1 guarded selection on the calm-only route only; the three uplift mixes containing calm stay on the unguarded previous ranking, so K1 does not reproduce the Phase 2J.1 guarded-baseline experiment as a whole.",
+    "seeds": "42000-42049 decide the reported gate statuses; 45000-45049 replicate. Both disjoint from every earlier seed set."
+  },
+  "prior_gates": {
+    "integrity": "100% target consistency, exact shares in every list, same-seed determinism on all 12 requests",
+    "single_family_mean_gain_lower_bound_gt": 0.0,
+    "single_family_configs_with_lower_bound_gt_0_min": 4,
+    "single_config_regression_upper_bound_lt": -0.1,
+    "multi_family_mean_change_lower_bound_gt": -0.1,
+    "multi_config_change_lower_bound_gt": -0.25,
+    "min_classifier_agreement_base_label_slots": 0.95,
+    "min_mean_classifier_probability_base_label_slots": 0.95,
+    "min_catalog_unique_tracks": 2000,
+    "max_mean_repeat_rate": 0.75,
+    "max_latency_p95_ms": 25.0,
+    "max_calm_speech_like_share": 0.2,
+    "calm_speech_like_not_worse_than_production": true
+  },
+  "seeds": {
+    "primary": "42000..42049",
+    "replication": "45000..45049",
+    "previously_used": {
+      "tests and cold-start probes": "0..49",
+      "Phase 2H.6 API test": "2024..2024",
+      "exploratory (2H.5-2I)": "2026..2075",
+      "held-out (2H.7-2H.8)": "7000..7049",
+      "third set (2H.8.1)": "12000..12049",
+      "fourth set (2H.9)": "15000..15049",
+      "held-out (2I)": "18000..18049",
+      "confirmation (2I.1)": "21000..21049",
+      "primary (2J)": "24000..24049",
+      "replication (2J)": "27000..27049",
+      "primary (2J.1)": "30000..30049",
+      "replication (2J.1)": "33000..33049",
+      "primary (2K)": "36000..36049",
+      "replication (2K)": "39000..39049"
+    },
+    "disjoint": true,
+    "runs_per_request": 50,
+    "bootstrap_rng": 0
+  },
+  "configurations": {
+    "single_target": {
+      "happy:30": [
+        "happy / match"
+      ],
+      "sad:30": [
+        "sad / match"
+      ],
+      "angry:30": [
+        "angry / match"
+      ],
+      "calm:30": [
+        "chill / match",
+        "stressed / uplift"
+      ],
+      "energetic:30": [
+        "energetic / match"
+      ],
+      "stressed:30": [
+        "stressed / match"
+      ]
+    },
+    "multi_target": {
+      "happy:19 + energetic:11": [
+        "happy / uplift"
+      ],
+      "happy:19 + calm:11": [
+        "sad / uplift"
+      ],
+      "calm:19 + happy:11": [
+        "angry / uplift"
+      ],
+      "energetic:19 + calm:11": [
+        "chill / uplift"
+      ],
+      "energetic:19 + happy:11": [
+        "energetic / uplift"
+      ]
+    }
+  },
+  "primary": {
+    "K1: production with calm cell guard (2K.1)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2966,
+        "mean_repeat_rate": 0.7151,
+        "mean_diversity": 4.06,
+        "single_target_mean_diversity": 4.06,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 1.92,
+          "p95": 4.83,
+          "max": 176.96
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 176.95,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.9,
+          "p95_ms": 4.7,
+          "max_ms": 7.25
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.004,
+          "sad / match": 0.0,
+          "sad / uplift": 0.078,
+          "angry / match": 0.0033,
+          "angry / uplift": 0.118,
+          "chill / match": 0.0,
+          "chill / uplift": 0.086,
+          "energetic / match": 0.0053,
+          "energetic / uplift": 0.01,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.2127,
+        "angry / uplift": 0.1863,
+        "chill / match": 0.0,
+        "chill / uplift": 0.2073,
+        "stressed / uplift": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.982,
+            "p5_probability": 0.9012,
+            "min_probability": 0.8176,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9862,
+            "min_probability": 0.9518,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9876,
+            "p5_probability": 0.943,
+            "min_probability": 0.8142,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9993,
+            "p5_probability": 0.9962,
+            "min_probability": 0.973,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9931,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.413,
+          "within_target_diversity": 2.413,
+          "random_eligible_list_diversity": 3.1172,
+          "unique_tracks_over_runs": 436,
+          "repeat_rate": 0.7093,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 3.6159,
+          "within_target_diversity": 3.6159,
+          "random_eligible_list_diversity": 3.3667,
+          "unique_tracks_over_runs": 410,
+          "repeat_rate": 0.7267,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1446,
+          "within_target_diversity": 3.1446,
+          "random_eligible_list_diversity": 2.9288,
+          "unique_tracks_over_runs": 462,
+          "repeat_rate": 0.692,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 3.8707,
+          "within_target_diversity": 3.8707,
+          "random_eligible_list_diversity": 3.1801,
+          "unique_tracks_over_runs": 407,
+          "repeat_rate": 0.7287,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 3.2747,
+          "within_target_diversity": 3.2747,
+          "random_eligible_list_diversity": 3.0923,
+          "unique_tracks_over_runs": 425,
+          "repeat_rate": 0.7167,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4319,
+          "within_target_diversity": 2.4319,
+          "random_eligible_list_diversity": 2.8739,
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1429,
+          "within_target_diversity": 2.3144,
+          "random_eligible_list_diversity": 3.2564,
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6445,
+          "within_target_diversity": 2.6275,
+          "random_eligible_list_diversity": 4.2462,
+          "unique_tracks_over_runs": 442,
+          "repeat_rate": 0.7053,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.1764,
+          "within_target_diversity": 3.6327,
+          "random_eligible_list_diversity": 4.2704,
+          "unique_tracks_over_runs": 331,
+          "repeat_rate": 0.7793,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8485,
+          "within_target_diversity": 3.1698,
+          "random_eligible_list_diversity": 4.3519,
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.2858,
+          "within_target_diversity": 2.6739,
+          "random_eligible_list_diversity": 3.2443,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_K": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.7732,
+            "ci95": [
+              -0.8624,
+              -0.6823
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.7732,
+            "ci95": [
+              -0.861,
+              -0.6845
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "paired_vs_B": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2436,
+              0.3591
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2428,
+              0.359
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.188,
+              2.3088
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.1881,
+              2.3136
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.1314,
+            "ci95": [
+              -0.2784,
+              0.0264
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.1314,
+            "ci95": [
+              -0.2737,
+              0.0123
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3103,
+              0.4744
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3142,
+              0.4724
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2436,
+              0.3591
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2428,
+              0.359
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.188,
+              2.3088
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.1881,
+              2.3136
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.1314,
+            "ci95": [
+              -0.2784,
+              0.0264
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.1314,
+            "ci95": [
+              -0.2737,
+              0.0123
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3103,
+              0.4744
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3142,
+              0.4724
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.4684,
+          "ci95": [
+            0.4356,
+            0.5055
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "prior_gates_vs_B": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "FAIL",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "K: production before the guard (2K)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2927,
+        "mean_repeat_rate": 0.7161,
+        "mean_diversity": 4.1888,
+        "single_target_mean_diversity": 4.1888,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 1.59,
+          "p95": 3.82,
+          "max": 4.64
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 1.6,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.59,
+          "p95_ms": 3.82,
+          "max_ms": 4.64
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.004,
+          "sad / match": 0.0,
+          "sad / uplift": 0.078,
+          "angry / match": 0.0033,
+          "angry / uplift": 0.118,
+          "chill / match": 0.18,
+          "chill / uplift": 0.086,
+          "energetic / match": 0.0053,
+          "energetic / uplift": 0.01,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.18
+        },
+        "calm_requests": 0.18
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.2127,
+        "angry / uplift": 0.1863,
+        "chill / match": 0.18,
+        "chill / uplift": 0.2073,
+        "stressed / uplift": 0.18
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.982,
+            "p5_probability": 0.9012,
+            "min_probability": 0.8176,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9862,
+            "min_probability": 0.9518,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9876,
+            "p5_probability": 0.943,
+            "min_probability": 0.8142,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9993,
+            "p5_probability": 0.9962,
+            "min_probability": 0.9737,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9931,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.413,
+          "within_target_diversity": 2.413,
+          "random_eligible_list_diversity": 3.1172,
+          "unique_tracks_over_runs": 436,
+          "repeat_rate": 0.7093,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 3.6159,
+          "within_target_diversity": 3.6159,
+          "random_eligible_list_diversity": 3.3667,
+          "unique_tracks_over_runs": 410,
+          "repeat_rate": 0.7267,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1446,
+          "within_target_diversity": 3.1446,
+          "random_eligible_list_diversity": 2.9288,
+          "unique_tracks_over_runs": 462,
+          "repeat_rate": 0.692,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 4.6439,
+          "within_target_diversity": 4.6439,
+          "random_eligible_list_diversity": 3.1801,
+          "unique_tracks_over_runs": 398,
+          "repeat_rate": 0.7347,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 3.2747,
+          "within_target_diversity": 3.2747,
+          "random_eligible_list_diversity": 3.0923,
+          "unique_tracks_over_runs": 425,
+          "repeat_rate": 0.7167,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4319,
+          "within_target_diversity": 2.4319,
+          "random_eligible_list_diversity": 2.8739,
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1429,
+          "within_target_diversity": 2.3144,
+          "random_eligible_list_diversity": 3.2564,
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6445,
+          "within_target_diversity": 2.6275,
+          "random_eligible_list_diversity": 4.2462,
+          "unique_tracks_over_runs": 442,
+          "repeat_rate": 0.7053,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.1764,
+          "within_target_diversity": 3.6327,
+          "random_eligible_list_diversity": 4.2704,
+          "unique_tracks_over_runs": 331,
+          "repeat_rate": 0.7793,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8485,
+          "within_target_diversity": 3.1698,
+          "random_eligible_list_diversity": 4.3519,
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.2858,
+          "within_target_diversity": 2.6739,
+          "random_eligible_list_diversity": 3.2443,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2447,
+              0.3597
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2992,
+            "ci95": [
+              0.2409,
+              0.3585
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.1882,
+              2.3104
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.2477,
+            "ci95": [
+              2.1867,
+              2.3106
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 0.6418,
+            "ci95": [
+              0.498,
+              0.7906
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.6418,
+            "ci95": [
+              0.4986,
+              0.7852
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3125,
+              0.4764
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3946,
+            "ci95": [
+              0.3104,
+              0.4746
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.5972,
+          "ci95": [
+            0.568,
+            0.6313
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "prior_gates_vs_B": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "PASS",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "B: previous production, no cells (context)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2432,
+        "mean_repeat_rate": 0.7332,
+        "mean_diversity": 3.8367,
+        "single_target_mean_diversity": 3.8367,
+        "single_target_requests_at_least_random_eligible": 8,
+        "requests_at_least_random_eligible": 8,
+        "mean_ranking_signal_of_served": 0.9927,
+        "single_target_mean_ranking_signal": 0.9927,
+        "latency_ms": {
+          "median": 1.74,
+          "p95": 3.66,
+          "max": 5.0
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 3.11,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.73,
+          "p95_ms": 3.67,
+          "max_ms": 4.99
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.004,
+          "sad / match": 0.0,
+          "sad / uplift": 0.078,
+          "angry / match": 0.0033,
+          "angry / uplift": 0.118,
+          "chill / match": 0.1933,
+          "chill / uplift": 0.086,
+          "energetic / match": 0.0133,
+          "energetic / uplift": 0.01,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.1933
+        },
+        "calm_requests": 0.1933
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.2127,
+        "angry / uplift": 0.1863,
+        "chill / match": 0.1933,
+        "chill / uplift": 0.2073,
+        "stressed / uplift": 0.1933
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9958,
+            "p5_probability": 0.9939,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9943,
+            "min_probability": 0.9927,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.1138,
+          "within_target_diversity": 2.1138,
+          "random_eligible_list_diversity": 3.1172,
+          "unique_tracks_over_runs": 464,
+          "repeat_rate": 0.6907,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 1.3682,
+          "within_target_diversity": 1.3682,
+          "random_eligible_list_diversity": 3.3667,
+          "unique_tracks_over_runs": 446,
+          "repeat_rate": 0.7027,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1446,
+          "within_target_diversity": 3.1446,
+          "random_eligible_list_diversity": 2.9288,
+          "unique_tracks_over_runs": 462,
+          "repeat_rate": 0.692,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 4.0021,
+          "within_target_diversity": 4.0021,
+          "random_eligible_list_diversity": 3.1801,
+          "unique_tracks_over_runs": 197,
+          "repeat_rate": 0.8687,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 2.8801,
+          "within_target_diversity": 2.8801,
+          "random_eligible_list_diversity": 3.0923,
+          "unique_tracks_over_runs": 456,
+          "repeat_rate": 0.696,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4319,
+          "within_target_diversity": 2.4319,
+          "random_eligible_list_diversity": 2.8739,
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1429,
+          "within_target_diversity": 2.3144,
+          "random_eligible_list_diversity": 3.2564,
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6445,
+          "within_target_diversity": 2.6275,
+          "random_eligible_list_diversity": 4.2462,
+          "unique_tracks_over_runs": 442,
+          "repeat_rate": 0.7053,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.1764,
+          "within_target_diversity": 3.6327,
+          "random_eligible_list_diversity": 4.2704,
+          "unique_tracks_over_runs": 331,
+          "repeat_rate": 0.7793,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8485,
+          "within_target_diversity": 3.1698,
+          "random_eligible_list_diversity": 4.3519,
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.2858,
+          "within_target_diversity": 2.6739,
+          "random_eligible_list_diversity": 3.2443,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      }
+    }
+  },
+  "replication": {
+    "K1: production with calm cell guard (2K.1)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2999,
+        "mean_repeat_rate": 0.7138,
+        "mean_diversity": 4.055,
+        "single_target_mean_diversity": 4.055,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 2.15,
+          "p95": 4.53,
+          "max": 6.83
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.17,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.14,
+          "p95_ms": 4.52,
+          "max_ms": 6.82
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.006,
+          "sad / match": 0.0,
+          "sad / uplift": 0.072,
+          "angry / match": 0.004,
+          "angry / uplift": 0.1187,
+          "chill / match": 0.0,
+          "chill / uplift": 0.0867,
+          "energetic / match": 0.008,
+          "energetic / uplift": 0.0127,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.1964,
+        "angry / uplift": 0.1874,
+        "chill / match": 0.0,
+        "chill / uplift": 0.2018,
+        "stressed / uplift": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9816,
+            "p5_probability": 0.8895,
+            "min_probability": 0.8333,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9857,
+            "min_probability": 0.9518,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9876,
+            "p5_probability": 0.9404,
+            "min_probability": 0.8186,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9992,
+            "p5_probability": 0.9964,
+            "min_probability": 0.9744,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.993,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.3823,
+          "within_target_diversity": 2.3823,
+          "random_eligible_list_diversity": 3.1296,
+          "unique_tracks_over_runs": 438,
+          "repeat_rate": 0.708,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 3.6142,
+          "within_target_diversity": 3.6142,
+          "random_eligible_list_diversity": 3.3827,
+          "unique_tracks_over_runs": 408,
+          "repeat_rate": 0.728,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1037,
+          "within_target_diversity": 3.1037,
+          "random_eligible_list_diversity": 2.8816,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 3.8786,
+          "within_target_diversity": 3.8786,
+          "random_eligible_list_diversity": 3.1893,
+          "unique_tracks_over_runs": 402,
+          "repeat_rate": 0.732,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 3.2213,
+          "within_target_diversity": 3.2213,
+          "random_eligible_list_diversity": 3.1064,
+          "unique_tracks_over_runs": 436,
+          "repeat_rate": 0.7093,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4648,
+          "within_target_diversity": 2.4648,
+          "random_eligible_list_diversity": 2.8195,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1692,
+          "within_target_diversity": 2.3372,
+          "random_eligible_list_diversity": 3.2291,
+          "unique_tracks_over_runs": 473,
+          "repeat_rate": 0.6847,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6141,
+          "within_target_diversity": 2.578,
+          "random_eligible_list_diversity": 4.2911,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.0994,
+          "within_target_diversity": 3.5147,
+          "random_eligible_list_diversity": 4.2622,
+          "unique_tracks_over_runs": 332,
+          "repeat_rate": 0.7787,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8986,
+          "within_target_diversity": 3.2249,
+          "random_eligible_list_diversity": 4.3174,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.3348,
+          "within_target_diversity": 2.7523,
+          "random_eligible_list_diversity": 3.2807,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_K": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.7815,
+            "ci95": [
+              -0.8884,
+              -0.6812
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.7815,
+            "ci95": [
+              -0.8923,
+              -0.6805
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "paired_vs_B": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1756,
+              0.2849
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1733,
+              0.2819
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2407,
+              2.3791
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2354,
+              2.3795
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.1951,
+            "ci95": [
+              -0.345,
+              -0.0516
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.1951,
+            "ci95": [
+              -0.3321,
+              -0.0488
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.243,
+              0.4438
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.2451,
+              0.4378
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1756,
+              0.2849
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1733,
+              0.2819
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2407,
+              2.3791
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2354,
+              2.3795
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": -0.1951,
+            "ci95": [
+              -0.345,
+              -0.0516
+            ]
+          },
+          "within_target_diversity": {
+            "mean": -0.1951,
+            "ci95": [
+              -0.3321,
+              -0.0488
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.243,
+              0.4438
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.2451,
+              0.4378
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.4476,
+          "ci95": [
+            0.4065,
+            0.4859
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "prior_gates_vs_B": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "FAIL",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "K: production before the guard (2K)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2977,
+        "mean_repeat_rate": 0.713,
+        "mean_diversity": 4.1852,
+        "single_target_mean_diversity": 4.1852,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 1.64,
+          "p95": 3.6,
+          "max": 5.45
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 1.48,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.63,
+          "p95_ms": 3.58,
+          "max_ms": 5.45
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.006,
+          "sad / match": 0.0,
+          "sad / uplift": 0.072,
+          "angry / match": 0.004,
+          "angry / uplift": 0.1187,
+          "chill / match": 0.1827,
+          "chill / uplift": 0.0867,
+          "energetic / match": 0.008,
+          "energetic / uplift": 0.0127,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.1827
+        },
+        "calm_requests": 0.1827
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.1964,
+        "angry / uplift": 0.1874,
+        "chill / match": 0.1827,
+        "chill / uplift": 0.2018,
+        "stressed / uplift": 0.1827
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9816,
+            "p5_probability": 0.8895,
+            "min_probability": 0.8333,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9857,
+            "min_probability": 0.9518,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9876,
+            "p5_probability": 0.9404,
+            "min_probability": 0.8186,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9993,
+            "p5_probability": 0.9964,
+            "min_probability": 0.9791,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9931,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.3823,
+          "within_target_diversity": 2.3823,
+          "random_eligible_list_diversity": 3.1296,
+          "unique_tracks_over_runs": 438,
+          "repeat_rate": 0.708,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 3.6142,
+          "within_target_diversity": 3.6142,
+          "random_eligible_list_diversity": 3.3827,
+          "unique_tracks_over_runs": 408,
+          "repeat_rate": 0.728,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1037,
+          "within_target_diversity": 3.1037,
+          "random_eligible_list_diversity": 2.8816,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 4.6601,
+          "within_target_diversity": 4.6601,
+          "random_eligible_list_diversity": 3.1893,
+          "unique_tracks_over_runs": 409,
+          "repeat_rate": 0.7273,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 3.2213,
+          "within_target_diversity": 3.2213,
+          "random_eligible_list_diversity": 3.1064,
+          "unique_tracks_over_runs": 436,
+          "repeat_rate": 0.7093,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4648,
+          "within_target_diversity": 2.4648,
+          "random_eligible_list_diversity": 2.8195,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1692,
+          "within_target_diversity": 2.3372,
+          "random_eligible_list_diversity": 3.2291,
+          "unique_tracks_over_runs": 473,
+          "repeat_rate": 0.6847,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6141,
+          "within_target_diversity": 2.578,
+          "random_eligible_list_diversity": 4.2911,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.0994,
+          "within_target_diversity": 3.5147,
+          "random_eligible_list_diversity": 4.2622,
+          "unique_tracks_over_runs": 332,
+          "repeat_rate": 0.7787,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8986,
+          "within_target_diversity": 3.2249,
+          "random_eligible_list_diversity": 4.3174,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.3348,
+          "within_target_diversity": 2.7523,
+          "random_eligible_list_diversity": 3.2807,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1738,
+              0.2821
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.229,
+            "ci95": [
+              0.1768,
+              0.2809
+            ]
+          },
+          "identical_lists": false
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2375,
+              2.3779
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.3082,
+            "ci95": [
+              2.2376,
+              2.3795
+            ]
+          },
+          "identical_lists": false
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 0.5864,
+            "ci95": [
+              0.4492,
+              0.7229
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.5864,
+            "ci95": [
+              0.4613,
+              0.7327
+            ]
+          },
+          "identical_lists": false
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.2425,
+              0.4398
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3434,
+            "ci95": [
+              0.2392,
+              0.4424
+            ]
+          },
+          "identical_lists": false
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "identical_lists": true
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.5778,
+          "ci95": [
+            0.5436,
+            0.6097
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "prior_gates_vs_B": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "PASS",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "B: previous production, no cells (context)": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2455,
+        "mean_repeat_rate": 0.7313,
+        "mean_diversity": 3.8474,
+        "single_target_mean_diversity": 3.8474,
+        "single_target_requests_at_least_random_eligible": 8,
+        "requests_at_least_random_eligible": 8,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9928,
+        "latency_ms": {
+          "median": 1.6,
+          "p95": 3.57,
+          "max": 4.74
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.43,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 1.59,
+          "p95_ms": 3.56,
+          "max_ms": 4.74
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.006,
+          "sad / match": 0.0,
+          "sad / uplift": 0.072,
+          "angry / match": 0.004,
+          "angry / uplift": 0.1187,
+          "chill / match": 0.1967,
+          "chill / uplift": 0.0867,
+          "energetic / match": 0.0113,
+          "energetic / uplift": 0.0127,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.1967
+        },
+        "calm_requests": 0.1967
+      },
+      "calm_slot_speech_like_share": {
+        "sad / uplift": 0.1964,
+        "angry / uplift": 0.1874,
+        "chill / match": 0.1967,
+        "chill / uplift": 0.2018,
+        "stressed / uplift": 0.1967
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9958,
+            "p5_probability": 0.9938,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9942,
+            "min_probability": 0.9926,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "list_diversity": 2.1533,
+          "within_target_diversity": 2.1533,
+          "random_eligible_list_diversity": 3.1296,
+          "unique_tracks_over_runs": 467,
+          "repeat_rate": 0.6887,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "list_diversity": 1.3061,
+          "within_target_diversity": 1.3061,
+          "random_eligible_list_diversity": 3.3827,
+          "unique_tracks_over_runs": 440,
+          "repeat_rate": 0.7067,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "list_diversity": 3.1037,
+          "within_target_diversity": 3.1037,
+          "random_eligible_list_diversity": 2.8816,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "list_diversity": 4.0737,
+          "within_target_diversity": 4.0737,
+          "random_eligible_list_diversity": 3.1893,
+          "unique_tracks_over_runs": 196,
+          "repeat_rate": 0.8693,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "list_diversity": 2.8779,
+          "within_target_diversity": 2.8779,
+          "random_eligible_list_diversity": 3.1064,
+          "unique_tracks_over_runs": 472,
+          "repeat_rate": 0.6853,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "list_diversity": 2.4648,
+          "within_target_diversity": 2.4648,
+          "random_eligible_list_diversity": 2.8195,
+          "unique_tracks_over_runs": 453,
+          "repeat_rate": 0.698,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "list_diversity": 4.1692,
+          "within_target_diversity": 2.3372,
+          "random_eligible_list_diversity": 3.2291,
+          "unique_tracks_over_runs": 473,
+          "repeat_rate": 0.6847,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "list_diversity": 5.6141,
+          "within_target_diversity": 2.578,
+          "random_eligible_list_diversity": 4.2911,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "list_diversity": 6.0994,
+          "within_target_diversity": 3.5147,
+          "random_eligible_list_diversity": 4.2622,
+          "unique_tracks_over_runs": 332,
+          "repeat_rate": 0.7787,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "list_diversity": 5.8986,
+          "within_target_diversity": 3.2249,
+          "random_eligible_list_diversity": 4.3174,
+          "unique_tracks_over_runs": 447,
+          "repeat_rate": 0.702,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "list_diversity": 4.3348,
+          "within_target_diversity": 2.7523,
+          "random_eligible_list_diversity": 3.2807,
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      }
+    }
+  },
+  "cold_start_median_of_5_processes": {
+    "K1: production with calm cell guard (2K.1)": {
+      "first_ms": 195.76,
+      "second_ms": 1.93,
+      "tenth_ms": 1.78
+    }
+  },
+  "notes": [
+    "Diversity is feature-space diversity, not listener-perceived variety; on calm it is inflated by speech-like tracks, so the guarded calm figure is not comparable as a gain or loss of variety.",
+    "Bootstrap intervals describe sampling variability over 50 seeded runs on one catalog only.",
+    "Cold start covers a calm-only request in a fresh process, including the one-time cell build."
+  ],
+  "runtime_s": 36.0
+}

@@ -1,0 +1,1431 @@
+{
+  "source_file": "data\\music_dataset2\\278k_labelled_uri.csv",
+  "source_sha256": "0b7c864e7de8d16eaf2c284af5ba7c3bce77a0e6f72a275b774e361bc40e1b02",
+  "label_to_mood": {
+    "0": "sad",
+    "1": "happy",
+    "2": "energetic",
+    "3": "calm"
+  },
+  "features": [
+    "danceability",
+    "energy",
+    "loudness",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo"
+  ],
+  "classifier_params": {
+    "n_classes": 4,
+    "lr": 0.7,
+    "epochs": 120,
+    "l2": 0.0001,
+    "batch_size": 2048,
+    "random_state": 42
+  },
+  "dataset": {
+    "rows": 277938,
+    "unique_track_ids": 277938,
+    "duplicate_track_ids": 0,
+    "missing_feature_values": {
+      "danceability": 0,
+      "energy": 0,
+      "loudness": 0,
+      "speechiness": 0,
+      "acousticness": 0,
+      "instrumentalness": 0,
+      "liveness": 0,
+      "valence": 0,
+      "tempo": 0
+    },
+    "class_distribution": {
+      "0=sad": {
+        "count": 82058,
+        "share": 0.2952
+      },
+      "1=happy": {
+        "count": 106429,
+        "share": 0.3829
+      },
+      "2=energetic": {
+        "count": 47065,
+        "share": 0.1693
+      },
+      "3=calm": {
+        "count": 42386,
+        "share": 0.1525
+      }
+    },
+    "tracks_with_tempo_zero": 90,
+    "tracks_with_positive_loudness": 314,
+    "tracks_sharing_identical_feature_vector": 3326
+  },
+  "held_out_evaluation": {
+    "train_rows": 236247,
+    "test_rows": 41691,
+    "naive_bayes_test_accuracy": 0.8004365450576864,
+    "softmax_test_accuracy": 0.835264205703869,
+    "softmax_cv_mean_accuracy": 0.8348381123640092,
+    "softmax_cv_std_accuracy": 0.0009742821904601966,
+    "classification_report": {
+      "accuracy": 0.835264205703869,
+      "macro_precision": 0.8443371988975336,
+      "macro_recall": 0.8390188260784945,
+      "macro_f1": 0.8411394793740461,
+      "per_class": {
+        "0": {
+          "precision": 0.8526470081048456,
+          "recall": 0.803395889186774,
+          "f1": 0.8272890785125695,
+          "support": 12309
+        },
+        "1": {
+          "precision": 0.8044057559069107,
+          "recall": 0.8509145577549486,
+          "f1": 0.8270067882256248,
+          "support": 15964
+        },
+        "2": {
+          "precision": 0.7985622285457541,
+          "recall": 0.7552407932011331,
+          "f1": 0.7762975904491519,
+          "support": 7060
+        },
+        "3": {
+          "precision": 0.9217338030326236,
+          "recall": 0.946524064171123,
+          "f1": 0.9339644603088384,
+          "support": 6358
+        }
+      }
+    },
+    "confusion_matrix": [
+      [
+        9889,
+        1675,
+        314,
+        431
+      ],
+      [
+        1282,
+        13584,
+        1030,
+        68
+      ],
+      [
+        115,
+        1601,
+        5332,
+        12
+      ],
+      [
+        312,
+        27,
+        1,
+        6018
+      ]
+    ],
+    "confusion_matrix_label_order": [
+      "sad",
+      "happy",
+      "energetic",
+      "calm"
+    ],
+    "legacy_audio_classifier": {
+      "test_accuracy_on_same_split": 0.835264205703869,
+      "prediction_agreement_with_new_model": 1.0
+    }
+  },
+  "derived_moods": {
+    "angry": {
+      "experimental": false,
+      "note": "Negative, high-arousal, loud. Mostly energetic-labelled tracks; cannot separate aggressive from merely dark/intense music.",
+      "rule": [
+        {
+          "feature": "valence",
+          "op": "<=",
+          "percentile": 0.25,
+          "cutoff": 0.22
+        },
+        {
+          "feature": "energy",
+          "op": ">=",
+          "percentile": 0.75,
+          "cutoff": 0.792
+        },
+        {
+          "feature": "loudness",
+          "op": ">=",
+          "percentile": 0.75,
+          "cutoff": -5.842
+        }
+      ],
+      "quantile_method": "pandas.Series.quantile (linear interpolation) over the full catalog",
+      "guards": {},
+      "score": {
+        "method": "extreme",
+        "features": {
+          "valence": -1,
+          "energy": 1,
+          "loudness": 1
+        },
+        "definition": "mean of percentile ranks, inverted where direction is -1"
+      },
+      "rule_match_count": 5706,
+      "candidate_count": 5706,
+      "candidate_true_label_mix": {
+        "energetic": 4936,
+        "happy": 662,
+        "sad": 107,
+        "calm": 1
+      }
+    },
+    "stressed": {
+      "experimental": true,
+      "note": "EXPERIMENTAL, ambiguous: matching tracks span the sad, happy and energetic labels. Not a ground-truth class. Ranked by closeness to the typical candidate, because ranking by extremeness surfaced failed-analysis and near-silent outliers. Tempo is not a rule gate (weak separation, octave errors); tempo == 0 only marks failed analysis.",
+      "rule": [
+        {
+          "feature": "valence",
+          "op": "<=",
+          "percentile": 0.4,
+          "cutoff": 0.35
+        },
+        {
+          "feature": "energy",
+          "op": ">=",
+          "percentile": 0.5,
+          "cutoff": 0.591
+        },
+        {
+          "feature": "energy",
+          "op": "<",
+          "percentile": 0.75,
+          "cutoff": 0.792
+        },
+        {
+          "feature": "danceability",
+          "op": "<=",
+          "percentile": 0.5,
+          "cutoff": 0.571
+        }
+      ],
+      "quantile_method": "pandas.Series.quantile (linear interpolation) over the full catalog",
+      "guards": {
+        "failed_audio_analysis": {
+          "checks": [
+            {
+              "feature": "danceability",
+              "op": "==",
+              "value": 0.0
+            },
+            {
+              "feature": "tempo",
+              "op": "==",
+              "value": 0.0
+            },
+            {
+              "feature": "valence",
+              "op": "==",
+              "value": 0.0
+            }
+          ],
+          "tracks_in_catalog": 135,
+          "rule_matches_excluded": 6
+        },
+        "spoken_word": {
+          "checks": [
+            {
+              "feature": "speechiness",
+              "op": ">",
+              "value": 0.66
+            }
+          ],
+          "tracks_in_catalog": 2281,
+          "rule_matches_excluded": 97
+        }
+      },
+      "score": {
+        "method": "profile closeness",
+        "profile_percentiles": {
+          "valence": 0.24323230360727932,
+          "energy": 0.6139732602235031,
+          "danceability": 0.263864602897049,
+          "loudness": 0.6382520562139757
+        },
+        "definition": "1 - mean absolute distance between the track's percentile ranks and the median percentile ranks of the guarded candidates"
+      },
+      "rule_match_count": 9059,
+      "candidate_count": 8956,
+      "candidate_true_label_mix": {
+        "sad": 4111,
+        "happy": 2538,
+        "energetic": 2125,
+        "calm": 182
+      }
+    }
+  },
+  "target_coverage": {
+    "Match my mood / happy": {
+      "targets": {
+        "happy": 1.0
+      },
+      "top30_requested_shares": {
+        "happy": 30
+      },
+      "top30_target_counts": {
+        "happy": 30
+      },
+      "top30_true_label_mix": {
+        "happy": 30
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "happy": 28
+      },
+      "top50_requested_shares": {
+        "happy": 50
+      },
+      "top50_target_counts": {
+        "happy": 50
+      },
+      "top50_true_label_mix": {
+        "happy": 50
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "happy": 48
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "happy": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 83,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Match my mood / sad": {
+      "targets": {
+        "sad": 1.0
+      },
+      "top30_requested_shares": {
+        "sad": 30
+      },
+      "top30_target_counts": {
+        "sad": 30
+      },
+      "top30_true_label_mix": {
+        "sad": 30
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "sad": 30
+      },
+      "top50_requested_shares": {
+        "sad": 50
+      },
+      "top50_target_counts": {
+        "sad": 50
+      },
+      "top50_true_label_mix": {
+        "sad": 50
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "sad": 50
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "sad": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 56,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Match my mood / angry": {
+      "targets": {
+        "angry": 1.0
+      },
+      "top30_requested_shares": {
+        "angry": 30
+      },
+      "top30_target_counts": {
+        "angry": 30
+      },
+      "top30_true_label_mix": {
+        "energetic": 27,
+        "happy": 3
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": null,
+      "top50_requested_shares": {
+        "angry": 50
+      },
+      "top50_target_counts": {
+        "angry": 50
+      },
+      "top50_true_label_mix": {
+        "energetic": 43,
+        "happy": 7
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": null,
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "angry": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 81,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Match my mood / chill": {
+      "targets": {
+        "calm": 1.0
+      },
+      "top30_requested_shares": {
+        "calm": 30
+      },
+      "top30_target_counts": {
+        "calm": 30
+      },
+      "top30_true_label_mix": {
+        "calm": 30
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "calm": 30
+      },
+      "top50_requested_shares": {
+        "calm": 50
+      },
+      "top50_target_counts": {
+        "calm": 50
+      },
+      "top50_true_label_mix": {
+        "calm": 50
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "calm": 49
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "calm": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 90,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Match my mood / energetic": {
+      "targets": {
+        "energetic": 1.0
+      },
+      "top30_requested_shares": {
+        "energetic": 30
+      },
+      "top30_target_counts": {
+        "energetic": 30
+      },
+      "top30_true_label_mix": {
+        "energetic": 30
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "energetic": 30
+      },
+      "top50_requested_shares": {
+        "energetic": 50
+      },
+      "top50_target_counts": {
+        "energetic": 50
+      },
+      "top50_true_label_mix": {
+        "energetic": 50
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "energetic": 50
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "energetic": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 76,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Match my mood / stressed": {
+      "targets": {
+        "stressed": 1.0
+      },
+      "top30_requested_shares": {
+        "stressed": 30
+      },
+      "top30_target_counts": {
+        "stressed": 30
+      },
+      "top30_true_label_mix": {
+        "sad": 20,
+        "happy": 9,
+        "energetic": 1
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": null,
+      "top50_requested_shares": {
+        "stressed": 50
+      },
+      "top50_target_counts": {
+        "stressed": 50
+      },
+      "top50_true_label_mix": {
+        "sad": 28,
+        "happy": 18,
+        "energetic": 4
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": null,
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "stressed": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 83,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / happy": {
+      "targets": {
+        "happy": 0.625,
+        "energetic": 0.375
+      },
+      "top30_requested_shares": {
+        "happy": 19,
+        "energetic": 11
+      },
+      "top30_target_counts": {
+        "happy": 19,
+        "energetic": 11
+      },
+      "top30_true_label_mix": {
+        "happy": 19,
+        "energetic": 11
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "happy": 28,
+        "energetic": 2
+      },
+      "top50_requested_shares": {
+        "happy": 31,
+        "energetic": 19
+      },
+      "top50_target_counts": {
+        "happy": 31,
+        "energetic": 19
+      },
+      "top50_true_label_mix": {
+        "happy": 31,
+        "energetic": 19
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "happy": 48,
+        "energetic": 2
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "happy": [
+            19,
+            19
+          ],
+          "energetic": [
+            11,
+            11
+          ]
+        },
+        "unique_tracks": 74,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / sad": {
+      "targets": {
+        "happy": 0.625,
+        "calm": 0.375
+      },
+      "top30_requested_shares": {
+        "happy": 19,
+        "calm": 11
+      },
+      "top30_target_counts": {
+        "happy": 19,
+        "calm": 11
+      },
+      "top30_true_label_mix": {
+        "happy": 19,
+        "calm": 11
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "happy": 28,
+        "calm": 0
+      },
+      "top50_requested_shares": {
+        "happy": 31,
+        "calm": 19
+      },
+      "top50_target_counts": {
+        "happy": 31,
+        "calm": 19
+      },
+      "top50_true_label_mix": {
+        "happy": 31,
+        "calm": 19
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "happy": 48,
+        "calm": 0
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "happy": [
+            19,
+            19
+          ],
+          "calm": [
+            11,
+            11
+          ]
+        },
+        "unique_tracks": 82,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / angry": {
+      "targets": {
+        "calm": 0.625,
+        "happy": 0.375
+      },
+      "top30_requested_shares": {
+        "calm": 19,
+        "happy": 11
+      },
+      "top30_target_counts": {
+        "calm": 19,
+        "happy": 11
+      },
+      "top30_true_label_mix": {
+        "calm": 19,
+        "happy": 11
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "calm": 30,
+        "happy": 0
+      },
+      "top50_requested_shares": {
+        "calm": 31,
+        "happy": 19
+      },
+      "top50_target_counts": {
+        "calm": 31,
+        "happy": 19
+      },
+      "top50_true_label_mix": {
+        "calm": 31,
+        "happy": 19
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "calm": 49,
+        "happy": 0
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "calm": [
+            19,
+            19
+          ],
+          "happy": [
+            11,
+            11
+          ]
+        },
+        "unique_tracks": 86,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / chill": {
+      "targets": {
+        "energetic": 0.625,
+        "calm": 0.375
+      },
+      "top30_requested_shares": {
+        "energetic": 19,
+        "calm": 11
+      },
+      "top30_target_counts": {
+        "energetic": 19,
+        "calm": 11
+      },
+      "top30_true_label_mix": {
+        "energetic": 19,
+        "calm": 11
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "energetic": 30,
+        "calm": 0
+      },
+      "top50_requested_shares": {
+        "energetic": 31,
+        "calm": 19
+      },
+      "top50_target_counts": {
+        "energetic": 31,
+        "calm": 19
+      },
+      "top50_true_label_mix": {
+        "energetic": 31,
+        "calm": 19
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "energetic": 50,
+        "calm": 0
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "energetic": [
+            19,
+            19
+          ],
+          "calm": [
+            11,
+            11
+          ]
+        },
+        "unique_tracks": 85,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / energetic": {
+      "targets": {
+        "energetic": 0.625,
+        "happy": 0.375
+      },
+      "top30_requested_shares": {
+        "energetic": 19,
+        "happy": 11
+      },
+      "top30_target_counts": {
+        "energetic": 19,
+        "happy": 11
+      },
+      "top30_true_label_mix": {
+        "energetic": 19,
+        "happy": 11
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "energetic": 30,
+        "happy": 0
+      },
+      "top50_requested_shares": {
+        "energetic": 31,
+        "happy": 19
+      },
+      "top50_target_counts": {
+        "energetic": 31,
+        "happy": 19
+      },
+      "top50_true_label_mix": {
+        "energetic": 31,
+        "happy": 19
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "energetic": 50,
+        "happy": 0
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "energetic": [
+            19,
+            19
+          ],
+          "happy": [
+            11,
+            11
+          ]
+        },
+        "unique_tracks": 84,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    },
+    "Cheer me up / stressed": {
+      "targets": {
+        "calm": 1.0
+      },
+      "top30_requested_shares": {
+        "calm": 30
+      },
+      "top30_target_counts": {
+        "calm": 30
+      },
+      "top30_true_label_mix": {
+        "calm": 30
+      },
+      "top30_duplicate_ids": 0,
+      "top30_off_target": 0,
+      "top30_weighted_sum_baseline": {
+        "calm": 30
+      },
+      "top50_requested_shares": {
+        "calm": 50
+      },
+      "top50_target_counts": {
+        "calm": 50
+      },
+      "top50_true_label_mix": {
+        "calm": 50
+      },
+      "top50_duplicate_ids": 0,
+      "top50_off_target": 0,
+      "top50_weighted_sum_baseline": {
+        "calm": 49
+      },
+      "served_20x_top30": {
+        "target_counts_min_max": {
+          "calm": [
+            30,
+            30
+          ]
+        },
+        "unique_tracks": 90,
+        "duplicate_ids_within_a_response": 0,
+        "off_target": 0
+      }
+    }
+  },
+  "stressed_outlier_diagnostics": {
+    "profile_ranking": {
+      "top30_feature_min_median_max": {
+        "valence": [
+          0.174,
+          0.208,
+          0.271
+        ],
+        "energy": [
+          0.665,
+          0.685,
+          0.724
+        ],
+        "danceability": [
+          0.392,
+          0.433,
+          0.479
+        ],
+        "loudness": [
+          -7.535,
+          -6.921,
+          -6.409
+        ],
+        "instrumentalness": [
+          0.0,
+          0.0,
+          0.889
+        ],
+        "speechiness": [
+          0.026,
+          0.036,
+          0.388
+        ],
+        "duration_ms": [
+          165559.0,
+          248634.0,
+          506360.0
+        ],
+        "tempo": [
+          74.965,
+          138.548,
+          181.127
+        ]
+      },
+      "top30_true_label_mix": {
+        "sad": 20,
+        "happy": 9,
+        "energetic": 1
+      },
+      "top30_outliers": {
+        "zero_valence_danceability_or_tempo": 0,
+        "speechiness_gt_0.66": 0,
+        "loudness_below_catalog_p5": 0,
+        "instrumentalness_gt_0.9": 0
+      },
+      "top90_outliers": {
+        "zero_valence_danceability_or_tempo": 0,
+        "speechiness_gt_0.66": 0,
+        "loudness_below_catalog_p5": 0,
+        "instrumentalness_gt_0.9": 0
+      }
+    },
+    "previous_extreme_ranking_baseline": {
+      "top30_feature_min_median_max": {
+        "valence": [
+          0.0,
+          0.017,
+          0.035
+        ],
+        "energy": [
+          0.602,
+          0.701,
+          0.78
+        ],
+        "danceability": [
+          0.0,
+          0.083,
+          0.134
+        ],
+        "loudness": [
+          -44.091,
+          -25.714,
+          -3.344
+        ],
+        "instrumentalness": [
+          0.0,
+          0.915,
+          0.992
+        ],
+        "speechiness": [
+          0.0,
+          0.062,
+          0.346
+        ],
+        "duration_ms": [
+          7145.0,
+          120435.0,
+          510720.0
+        ],
+        "tempo": [
+          0.0,
+          90.862,
+          188.209
+        ]
+      },
+      "top30_true_label_mix": {
+        "calm": 13,
+        "energetic": 9,
+        "sad": 7,
+        "happy": 1
+      },
+      "top30_outliers": {
+        "zero_valence_danceability_or_tempo": 5,
+        "speechiness_gt_0.66": 0,
+        "loudness_below_catalog_p5": 16,
+        "instrumentalness_gt_0.9": 16
+      },
+      "top90_outliers": {
+        "zero_valence_danceability_or_tempo": 6,
+        "speechiness_gt_0.66": 1,
+        "loudness_below_catalog_p5": 46,
+        "instrumentalness_gt_0.9": 52
+      }
+    }
+  },
+  "recommendation_examples_top30_head": {
+    "Match my mood / angry": [
+      {
+        "track_id": "28yQYAZbYxLG7lcdagfCiC",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.997,
+        "valence": 0.032,
+        "energy": 1.0,
+        "loudness": 1.095,
+        "danceability": 0.644
+      },
+      {
+        "track_id": "7wHOwTwQYtQNVCS4AJ5CDm",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.994,
+        "valence": 0.034,
+        "energy": 0.998,
+        "loudness": -1.171,
+        "danceability": 0.172
+      },
+      {
+        "track_id": "1i2Emkwn9VV8tuUVMob51l",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.994,
+        "valence": 0.026,
+        "energy": 0.999,
+        "loudness": -2.265,
+        "danceability": 0.198
+      },
+      {
+        "track_id": "6f2pC1bRLRBRl8cHF7BouV",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.993,
+        "valence": 0.035,
+        "energy": 0.997,
+        "loudness": 0.21,
+        "danceability": 0.288
+      },
+      {
+        "track_id": "4eF2wNksLBV2f4teBvtQRy",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.992,
+        "valence": 0.036,
+        "energy": 0.999,
+        "loudness": -1.197,
+        "danceability": 0.16
+      },
+      {
+        "track_id": "6kGNLFT2tK9npF26tGnx8e",
+        "target": "angry",
+        "mood": "happy",
+        "score": 0.991,
+        "valence": 0.032,
+        "energy": 0.984,
+        "loudness": -0.673,
+        "danceability": 0.606
+      },
+      {
+        "track_id": "4XMjQMXE9XiKG6r3Ms7snz",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.99,
+        "valence": 0.035,
+        "energy": 0.984,
+        "loudness": -0.317,
+        "danceability": 0.466
+      },
+      {
+        "track_id": "3SyEt1Ziz3FUilySe8XSBl",
+        "target": "angry",
+        "mood": "energetic",
+        "score": 0.989,
+        "valence": 0.038,
+        "energy": 0.999,
+        "loudness": 2.067,
+        "danceability": 0.356
+      }
+    ],
+    "Match my mood / stressed": [
+      {
+        "track_id": "1Hs6CYsj1r2lq4wkJofXHJ",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.987,
+        "valence": 0.216,
+        "energy": 0.708,
+        "loudness": -6.871,
+        "danceability": 0.431
+      },
+      {
+        "track_id": "3oay6hzPmMRxg4Z5p8T8xs",
+        "target": "stressed",
+        "mood": "happy",
+        "score": 0.987,
+        "valence": 0.202,
+        "energy": 0.681,
+        "loudness": -7.093,
+        "danceability": 0.452
+      },
+      {
+        "track_id": "5n6RDaGFSN88oRWuGtYAIN",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.986,
+        "valence": 0.189,
+        "energy": 0.687,
+        "loudness": -6.926,
+        "danceability": 0.426
+      },
+      {
+        "track_id": "7kWqgvTLq4pb5nGqtwJREJ",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.986,
+        "valence": 0.201,
+        "energy": 0.693,
+        "loudness": -7.031,
+        "danceability": 0.428
+      },
+      {
+        "track_id": "5T3i5WkfjgJQpl8IANqjXZ",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.986,
+        "valence": 0.224,
+        "energy": 0.685,
+        "loudness": -6.805,
+        "danceability": 0.417
+      },
+      {
+        "track_id": "07nYZZQT49i7yAIs3k3tOe",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.984,
+        "valence": 0.201,
+        "energy": 0.689,
+        "loudness": -7.137,
+        "danceability": 0.453
+      },
+      {
+        "track_id": "7KXAgGAHEB1Ny89pL6eEA0",
+        "target": "stressed",
+        "mood": "happy",
+        "score": 0.984,
+        "valence": 0.187,
+        "energy": 0.673,
+        "loudness": -6.851,
+        "danceability": 0.448
+      },
+      {
+        "track_id": "1hHuyqVCZCbhYQixEkdQCo",
+        "target": "stressed",
+        "mood": "sad",
+        "score": 0.983,
+        "valence": 0.194,
+        "energy": 0.678,
+        "loudness": -7.211,
+        "danceability": 0.436
+      }
+    ],
+    "Cheer me up / sad": [
+      {
+        "track_id": "0PBbGtt09Jefz2FqHx99fp",
+        "target": "happy",
+        "mood": "happy",
+        "score": 0.999,
+        "valence": 0.814,
+        "energy": 0.992,
+        "loudness": 2.168,
+        "danceability": 0.972
+      },
+      {
+        "track_id": "7LvTmOgxWYuH2nXdOD6D2i",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.043,
+        "energy": 0.008,
+        "loudness": -38.978,
+        "danceability": 0.073
+      },
+      {
+        "track_id": "7MwGWKdDGeop9D8bZN37hc",
+        "target": "happy",
+        "mood": "happy",
+        "score": 0.998,
+        "valence": 0.966,
+        "energy": 0.837,
+        "loudness": -9.806,
+        "danceability": 0.978
+      },
+      {
+        "track_id": "3ha1Y77noIWjdpHTTxMIQl",
+        "target": "happy",
+        "mood": "happy",
+        "score": 0.998,
+        "valence": 0.974,
+        "energy": 0.932,
+        "loudness": -3.618,
+        "danceability": 0.931
+      },
+      {
+        "track_id": "0qqvlSXjz8XXwjsXGAuPwh",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.033,
+        "energy": 0.004,
+        "loudness": -38.348,
+        "danceability": 0.146
+      },
+      {
+        "track_id": "38bP8r9yx49g6pdQ90NH1X",
+        "target": "happy",
+        "mood": "happy",
+        "score": 0.998,
+        "valence": 0.908,
+        "energy": 0.822,
+        "loudness": -6.642,
+        "danceability": 0.963
+      },
+      {
+        "track_id": "3unVls9LCPxpXOOKcVzGBA",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.033,
+        "energy": 0.003,
+        "loudness": -38.267,
+        "danceability": 0.124
+      },
+      {
+        "track_id": "1pJ1D6ooojg2njkoa1Xhmv",
+        "target": "happy",
+        "mood": "happy",
+        "score": 0.998,
+        "valence": 0.967,
+        "energy": 0.83,
+        "loudness": -7.54,
+        "danceability": 0.913
+      }
+    ],
+    "Cheer me up / chill": [
+      {
+        "track_id": "4iPGVtwyFfwCckMBSRENNW",
+        "target": "energetic",
+        "mood": "energetic",
+        "score": 0.999,
+        "valence": 0.03,
+        "energy": 0.985,
+        "loudness": -5.67,
+        "danceability": 0.176
+      },
+      {
+        "track_id": "7LvTmOgxWYuH2nXdOD6D2i",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.043,
+        "energy": 0.008,
+        "loudness": -38.978,
+        "danceability": 0.073
+      },
+      {
+        "track_id": "0DtUyeqJIvuOY58kqg0ZCd",
+        "target": "energetic",
+        "mood": "energetic",
+        "score": 0.999,
+        "valence": 0.039,
+        "energy": 0.989,
+        "loudness": -3.258,
+        "danceability": 0.134
+      },
+      {
+        "track_id": "2XO0tJtBsNl20arRorjTEO",
+        "target": "energetic",
+        "mood": "energetic",
+        "score": 0.999,
+        "valence": 0.134,
+        "energy": 0.995,
+        "loudness": -4.377,
+        "danceability": 0.145
+      },
+      {
+        "track_id": "0qqvlSXjz8XXwjsXGAuPwh",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.033,
+        "energy": 0.004,
+        "loudness": -38.348,
+        "danceability": 0.146
+      },
+      {
+        "track_id": "2dK63cr7pS5udP5fbhLVxS",
+        "target": "energetic",
+        "mood": "energetic",
+        "score": 0.999,
+        "valence": 0.038,
+        "energy": 0.996,
+        "loudness": -1.949,
+        "danceability": 0.164
+      },
+      {
+        "track_id": "3unVls9LCPxpXOOKcVzGBA",
+        "target": "calm",
+        "mood": "calm",
+        "score": 1.0,
+        "valence": 0.033,
+        "energy": 0.003,
+        "loudness": -38.267,
+        "danceability": 0.124
+      },
+      {
+        "track_id": "0vmrcHXNc8wuuowKWOzBr3",
+        "target": "energetic",
+        "mood": "energetic",
+        "score": 0.999,
+        "valence": 0.153,
+        "energy": 0.997,
+        "loudness": -1.009,
+        "danceability": 0.256
+      }
+    ]
+  },
+  "final_model": {
+    "trained_rows": 277938,
+    "in_sample_accuracy": 0.83545251099166
+  },
+  "catalog": {
+    "path": "data\\music_catalog_278k.csv",
+    "rows": 277938,
+    "columns": [
+      "track_id",
+      "label",
+      "mood",
+      "duration_ms",
+      "danceability",
+      "energy",
+      "loudness",
+      "speechiness",
+      "acousticness",
+      "instrumentalness",
+      "liveness",
+      "valence",
+      "tempo",
+      "proba_sad",
+      "proba_happy",
+      "proba_energetic",
+      "proba_calm",
+      "predicted_mood",
+      "mood_confidence",
+      "derived_angry",
+      "derived_angry_score",
+      "derived_stressed",
+      "derived_stressed_score"
+    ],
+    "unique_track_ids": 277938,
+    "missing_values": 0
+  },
+  "comparison_with_legacy": {
+    "legacy_music_final": {
+      "rows": 1023,
+      "has_spotify_track_id": false,
+      "mood_label_space": [
+        "angry",
+        "chill",
+        "energetic",
+        "happy",
+        "sad",
+        "stressed"
+      ],
+      "mood_source": "K-Means (k=6) fitted on these 1,023 rows, clusters mapped to moods by hand-set anchors",
+      "mood_distribution": {
+        "sad": 200,
+        "energetic": 174,
+        "happy": 170,
+        "angry": 164,
+        "stressed": 159,
+        "chill": 156
+      },
+      "ranking_score": "0.75 * cosine similarity to K-Means centroid + 0.25 * popularity",
+      "memory_mb": 0.63
+    },
+    "catalog_278k": {
+      "rows": 277938,
+      "has_spotify_track_id": true,
+      "mood_label_space": [
+        "calm",
+        "energetic",
+        "happy",
+        "sad"
+      ],
+      "mood_source": "dataset ground-truth labels (0=sad, 1=happy, 2=energetic, 3=calm)",
+      "mood_distribution": {
+        "happy": 106429,
+        "sad": 82058,
+        "energetic": 47065,
+        "calm": 42386
+      },
+      "ranking_score": "target coverage: weight-proportional share per target; true-label candidates ranked by classifier P(label), derived moods by percentile score; no popularity",
+      "memory_mb": 90.29
+    },
+    "recommend_music_ms_per_call_top30": {
+      "legacy_music_final": {
+        "Match my mood / happy": 4.4,
+        "Match my mood / stressed": 5.0,
+        "Cheer me up / happy": 4.4,
+        "Cheer me up / stressed": 3.8
+      },
+      "catalog_278k": {
+        "Match my mood / happy": 4.7,
+        "Match my mood / stressed": 2.4,
+        "Cheer me up / happy": 7.8,
+        "Cheer me up / stressed": 3.5
+      }
+    },
+    "legacy_audio_classifier_eval_file": {
+      "n_rows": 277938,
+      "softmax_test_accuracy": 0.835264205703869,
+      "softmax_cv_mean_accuracy": 0.8348381123640092
+    },
+    "notes": [
+      "The legacy catalog has no ground-truth labels, so recommendation quality of the two catalogs cannot be compared directly; only structure, label space and cost are compared."
+    ]
+  },
+  "runtime": {
+    "load_validate_s": 1.7,
+    "held_out_train_eval_s": 61.9,
+    "final_fit_s": 29.2,
+    "derive_moods_s": 0.54,
+    "coverage_eval_s": 2.5,
+    "total_s": 153.4,
+    "catalog_csv_mb": 45.7,
+    "catalog_load_s": 0.98,
+    "catalog_in_memory_mb": 90.3,
+    "pipeline_peak_traced_memory_mb": 241.4
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "_about": [
+    "Artist prioritization for music recommendations (src/artist_priority.py).",
+    "A track counts as a priority track only when one of its artists, as listed in the local",
+    "metadata (data/metadata/music_metadata.csv, matched by exact Spotify track_id), equals a name",
+    "below exactly (case-sensitive). Tracks without local metadata are never treated as priority",
+    "tracks. Each name was checked against the tracks it matches in the local metadata on 2026-10-10.",
+    "Off by default (it failed the Phase 2K diversity/repeat-rate gates at max_share 0.3, see README).",
+    "Switch on with enabled: true or MOODCAST_ARTIST_PRIORITY=1; MOODCAST_ARTIST_PRIORITY=0 always switches it off."
+  ],
+  "enabled": false,
+  "max_share": 0.15,
+  "max_per_artist": 2,
+  "categories": {
+    "international": {
+      "label": "International pop",
+      "artists": [
+        "Taylor Swift", "Ed Sheeran", "Ariana Grande", "Billie Eilish", "The Weeknd", "Dua Lipa", "Justin Bieber",
+        "Drake", "Rihanna", "Beyoncé", "Bruno Mars", "Lady Gaga", "Katy Perry", "Adele", "Harry Styles",
+        "Olivia Rodrigo", "Post Malone", "Shawn Mendes", "Selena Gomez", "Coldplay", "Imagine Dragons", "Maroon 5",
+        "Sia", "Eminem", "Doja Cat", "SZA", "Lana Del Rey", "Charlie Puth", "Camila Cabello", "Miley Cyrus",
+        "Halsey", "Khalid", "Sam Smith", "Bad Bunny", "J Balvin", "Shakira", "Kendrick Lamar", "Travis Scott",
+        "Lizzo", "Lorde", "One Direction", "Michael Jackson", "Madonna", "Alicia Keys", "Justin Timberlake",
+        "Calvin Harris", "David Guetta", "Marshmello", "The Chainsmokers", "Avicii", "Kygo", "OneRepublic",
+        "Twenty One Pilots", "Arctic Monkeys", "Lewis Capaldi", "Ellie Goulding", "Jason Derulo", "Pitbull",
+        "Nicki Minaj", "Cardi B", "Megan Thee Stallion", "Kanye West", "JAY-Z"
+      ]
+    },
+    "kpop": {
+      "label": "K-pop",
+      "artists": [
+        "BTS", "BLACKPINK", "TWICE", "EXO", "SEVENTEEN", "Red Velvet", "Red Velvet - IRENE & SEULGI", "NCT 127",
+        "NCT DREAM", "NCT U", "ITZY", "(G)I-DLE", "MAMAMOO", "BIGBANG", "SHINee", "SUPER JUNIOR", "GOT7", "ATEEZ",
+        "TOMORROW X TOGETHER", "ENHYPEN", "IU", "PSY", "Girls' Generation", "2NE1", "JENNIE", "ROSÉ", "TAEYEON",
+        "SUNMI", "ZICO", "Epik High", "BTOB", "Agust D", "j-hope", "SUGA", "G-DRAGON", "TAEMIN", "BAEKHYUN",
+        "Apink", "f(x)", "Wonder Girls", "EXID", "GFRIEND", "OH MY GIRL", "WINNER", "iKON", "DAY6", "TREASURE",
+        "STAYC", "LOONA", "INFINITE", "2PM", "4Minute", "SISTAR", "DREAMCATCHER"
+      ]
+    },
+    "indian": {
+      "label": "Indian",
+      "artists": [
+        "Arijit Singh", "A.R. Rahman", "Pritam", "Shreya Ghoshal", "Lata Mangeshkar", "Kishore Kumar",
+        "Mohammed Rafi", "Asha Bhosle", "Sonu Nigam", "Shankar-Ehsaan-Loy", "Vishal-Shekhar", "Amit Trivedi",
+        "Neha Kakkar", "Badshah", "Diljit Dosanjh", "Sunidhi Chauhan", "Shaan", "KK", "Udit Narayan", "Alka Yagnik",
+        "Kumar Sanu", "Shankar Mahadevan", "Mohit Chauhan", "Jubin Nautiyal", "Armaan Malik", "Darshan Raval",
+        "Vishal Dadlani", "Yo Yo Honey Singh", "Guru Randhawa", "Sidhu Moose Wala", "AP Dhillon", "Prateek Kuhad",
+        "Ritviz", "Anuv Jain", "DIVINE", "Raftaar", "Nucleya", "Lucky Ali", "Papon", "Javed Ali", "Ilaiyaraaja",
+        "S. P. Balasubrahmanyam", "Anirudh Ravichander", "Sid Sriram", "Shilpa Rao", "Jasleen Royal",
+        "Harrdy Sandhu", "Tanishk Bagchi", "Mithoon", "Ankit Tiwari", "Sachet Tandon", "Benny Dayal",
+        "Shalmali Kholgade", "Monali Thakur", "Palak Muchhal", "Kavita Krishnamurthy", "Hariharan", "Pankaj Udhas",
+        "Jagjit Singh", "Kailash Kher", "Sukhwinder Singh", "Mika Singh", "Dhvani Bhanushali", "Tulsi Kumar",
+        "B Praak", "Amaal Mallik", "Vishal Mishra", "Emiway Bantai", "The Local Train", "Raghu Dixit",
+        "Hemant Kumar", "Manna Dey", "Bappi Lahiri", "Jatin-Lalit", "Himesh Reshammiya", "Shekhar Ravjiani"
+      ]
+    }
+  },
+  "_excluded_names": {
+    "Jin": "the local metadata's 'Jin' is a Japanese Vocaloid producer ('Kagerou Days'), not BTS's Jin",
+    "King": "matches both the Indian rapper and a 1980s UK band",
+    "Mukesh": "matches the Hindi playback singer and a different Tamil-credit artist",
+    "V": "single-letter name; too generic to trust as an exact match (BTS's V is covered by BTS)",
+    "RM": "two-letter name; too generic to trust as an exact match (covered by BTS)",
+    "Atif Aslam / Rahat Fateh Ali Khan / Nusrat Fateh Ali Khan": "Pakistani artists, not Indian (often on Bollywood soundtracks); add them here if wanted",
+    "not in the local metadata": "Stray Kids, aespa, MONSTA X, LISA, Jung Kook, Jimin, IVE, NewJeans, LE SSERAFIM, CHUNG HA, T-ARA, THE BOYZ, Kep1er, NMIXX, ASTRO, VIXX, Block B, B.A.P, Heize, Salim-Sulaiman, R. D. Burman, Laxmikant-Pyarelal, Stebin Ben, Seedhe Maut, Krsna, When Chai Met Toast, Lifafa, Peter Cat Recording Co., Indian Ocean, Euphoria, Parikrama, Shankar Jaikishan, S. D. Burman, Talat Mahmood, Geeta Dutt, Anu Malik, Nadeem-Shravan"
+  }
+}

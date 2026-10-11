@@ -1,0 +1,28 @@
+{
+  "_about": [
+    "Curated artists for the Popular Artists music mode (src/popular_artists.py, prepare_popular_artists.py).",
+    "Separate from config/artist_priority.json and from the 278k catalog: these names are matched against the",
+    "local 2024 multilingual dataset (data/external/popular_artists_2024/, see DATA.md) only.",
+    "A track belongs to an artist only when that exact name appears in the dataset's artist string as a",
+    "complete comma-separated entry (case-sensitive): 'Pritam' never matches 'Pritam Chakraborty'.",
+    "Each name was checked against the dataset on 2026-10-10. Categories are used only to balance a list",
+    "internally; they are never sent to the browser or shown."
+  ],
+  "categories": {
+    "international": [
+      "Taylor Swift", "The Weeknd", "Ed Sheeran", "Dua Lipa", "Bruno Mars", "Ariana Grande", "Drake",
+      "Justin Bieber", "Coldplay", "Adele", "Rihanna", "Imagine Dragons", "SZA", "Post Malone", "Doja Cat",
+      "Maroon 5", "Shawn Mendes", "Selena Gomez", "Sia", "OneRepublic"
+    ],
+    "kpop": [
+      "BTS", "BLACKPINK", "TWICE", "SEVENTEEN", "Stray Kids", "aespa", "NewJeans", "ENHYPEN", "LE SSERAFIM",
+      "ITZY", "TOMORROW X TOGETHER", "NCT 127", "JENNIE", "ATEEZ", "ZEROBASEONE", "BIGBANG", "SHINee", "GOT7",
+      "MONSTA X", "DAY6"
+    ],
+    "indian": [
+      "Arijit Singh", "A.R. Rahman", "Shreya Ghoshal", "Pritam", "Anirudh Ravichander", "Sid Sriram", "Badshah",
+      "Diljit Dosanjh", "Jubin Nautiyal", "Mohit Chauhan", "Vishal-Shekhar", "Shankar-Ehsaan-Loy", "Neha Kakkar",
+      "Sonu Nigam", "AP Dhillon", "Karan Aujla", "Armaan Malik", "Darshan Raval", "Sunidhi Chauhan", "Vishal Mishra"
+    ]
+  }
+}

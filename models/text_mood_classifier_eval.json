@@ -1,0 +1,227 @@
+{
+  "n_examples": 1532,
+  "moods": [
+    "angry",
+    "chill",
+    "energetic",
+    "happy",
+    "sad",
+    "stressed"
+  ],
+  "in_distribution_test_accuracy": 0.954248366013072,
+  "cv_mean_accuracy": 0.9412679564440086,
+  "cv_std_accuracy": 0.008877779832449242,
+  "classification_report": {
+    "accuracy": 0.954248366013072,
+    "macro_precision": 0.9547215112460078,
+    "macro_recall": 0.9541151332327803,
+    "macro_f1": 0.9542022744614475,
+    "per_class": {
+      "0": {
+        "precision": 0.9795918367346939,
+        "recall": 0.9411764705882353,
+        "f1": 0.96,
+        "support": 51
+      },
+      "1": {
+        "precision": 0.9215686274509803,
+        "recall": 0.94,
+        "f1": 0.9306930693069307,
+        "support": 50
+      },
+      "2": {
+        "precision": 0.9607843137254902,
+        "recall": 0.9607843137254902,
+        "f1": 0.9607843137254902,
+        "support": 51
+      },
+      "3": {
+        "precision": 0.9245283018867925,
+        "recall": 0.9607843137254902,
+        "f1": 0.9423076923076923,
+        "support": 51
+      },
+      "4": {
+        "precision": 0.9795918367346939,
+        "recall": 0.9411764705882353,
+        "f1": 0.96,
+        "support": 51
+      },
+      "5": {
+        "precision": 0.9622641509433962,
+        "recall": 0.9807692307692307,
+        "f1": 0.9714285714285713,
+        "support": 52
+      }
+    }
+  },
+  "confusion_matrix": [
+    [
+      48,
+      0,
+      0,
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      47,
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      49,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      49,
+      0,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      1,
+      48,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      51
+    ]
+  ],
+  "confusion_matrix_label_order": [
+    "angry",
+    "chill",
+    "energetic",
+    "happy",
+    "sad",
+    "stressed"
+  ],
+  "holdout_generalization_accuracy": 0.8333333333333334,
+  "holdout_examples": [
+    {
+      "text": "my best friend just got married and I'm overjoyed for her",
+      "expected": "happy",
+      "predicted": "happy",
+      "confidence": 0.6428609310084384
+    },
+    {
+      "text": "got a promotion out of nowhere and I'm walking on air",
+      "expected": "happy",
+      "predicted": "happy",
+      "confidence": 0.28468744366376253
+    },
+    {
+      "text": "the kids surprised me with breakfast in bed this morning",
+      "expected": "happy",
+      "predicted": "happy",
+      "confidence": 0.27597604601602865
+    },
+    {
+      "text": "since she left I just sit in silence most nights",
+      "expected": "sad",
+      "predicted": "sad",
+      "confidence": 0.4210524079951956
+    },
+    {
+      "text": "the funeral was yesterday and the house feels so quiet now",
+      "expected": "sad",
+      "predicted": "sad",
+      "confidence": 0.37000337731540506
+    },
+    {
+      "text": "I keep checking my phone hoping he'll text back but he never does",
+      "expected": "sad",
+      "predicted": "sad",
+      "confidence": 0.19399096579765399
+    },
+    {
+      "text": "I can't believe he lied to my face like that",
+      "expected": "angry",
+      "predicted": "angry",
+      "confidence": 0.307952773381487
+    },
+    {
+      "text": "the airline lost my luggage and customer service was useless",
+      "expected": "angry",
+      "predicted": "sad",
+      "confidence": 0.2821801046305644
+    },
+    {
+      "text": "my roommate ate my leftovers again after I explicitly asked him not to",
+      "expected": "angry",
+      "predicted": "angry",
+      "confidence": 0.3227935384138091
+    },
+    {
+      "text": "lying in a hammock with a good book, couldn't be more at ease",
+      "expected": "chill",
+      "predicted": "chill",
+      "confidence": 0.5079144388857778
+    },
+    {
+      "text": "just soaking in the bath with candles and soft jazz",
+      "expected": "chill",
+      "predicted": "chill",
+      "confidence": 0.5771327485834077
+    },
+    {
+      "text": "we're just wandering the city with no map and no plans",
+      "expected": "chill",
+      "predicted": "chill",
+      "confidence": 0.2695631122977853
+    },
+    {
+      "text": "just got back from the gym feeling unstoppable",
+      "expected": "energetic",
+      "predicted": "energetic",
+      "confidence": 0.5643047956059019
+    },
+    {
+      "text": "the whole stadium was on its feet screaming",
+      "expected": "energetic",
+      "predicted": "happy",
+      "confidence": 0.2206974181794125
+    },
+    {
+      "text": "three cups of coffee in and I'm ready to run through a wall",
+      "expected": "energetic",
+      "predicted": "energetic",
+      "confidence": 0.5597245084812499
+    },
+    {
+      "text": "ugh work has been a nightmare and I can barely breathe",
+      "expected": "stressed",
+      "predicted": "stressed",
+      "confidence": 0.2770917441207697
+    },
+    {
+      "text": "rent's due, the car broke down, and finals are next week",
+      "expected": "stressed",
+      "predicted": "sad",
+      "confidence": 0.26580096129719294
+    },
+    {
+      "text": "my boss just added another task an hour before the deadline",
+      "expected": "stressed",
+      "predicted": "stressed",
+      "confidence": 0.2672961383450175
+    }
+  ]
+}

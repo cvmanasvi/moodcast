@@ -1,0 +1,1089 @@
+{
+  "evaluation_date": "2026-10-09",
+  "what_this_measures": "recommendation lists served by src.recommend.recommend_music on the 278k catalog; NOT classifier accuracy (see music_mood_classifier_278k_eval.json for that)",
+  "catalog": {
+    "path": "data\\music_catalog_278k.csv",
+    "sha256": "a261afeea3b11859cd5a8cdb65fc12402a08b8dc4e684b670c791c0dd2af9a6a",
+    "rows": 277938,
+    "unique_track_ids": 277938,
+    "audio_features_missing_values": 0,
+    "labels": [
+      "calm",
+      "energetic",
+      "happy",
+      "sad"
+    ],
+    "label_counts": {
+      "happy": 106429,
+      "sad": 82058,
+      "energetic": 47065,
+      "calm": 42386
+    },
+    "derived_columns_present": true,
+    "derived_counts": {
+      "angry": 5706,
+      "stressed": 8956
+    },
+    "has_popularity_column": false
+  },
+  "definitions": {
+    "relevance": {
+      "dataset label": "track's `label` equals the target (sad/happy/energetic/calm). Labels come from the Moodify dataset, which describes them as model-generated; not human per-track ground truth.",
+      "derived rule": "track's `derived_angry` is true: valence <= 25th pct, energy >= 75th pct, loudness >= 75th pct of the catalog. A feature rule, not a label.",
+      "derived (experimental rule)": "track's `derived_stressed` is true: the stressed percentile rule after the failed-analysis and spoken-word guards. Experimental, not a label.",
+      "request": "a request's relevant set is the union of its targets' sets (app mood -> targets via MOOD_TO_MUSIC_TARGETS; 'Cheer me up' first maps the mood through MOOD_TO_TAGS_CHEER).",
+      "app_mood_targets": {
+        "happy": [
+          "happy"
+        ],
+        "sad": [
+          "sad"
+        ],
+        "energetic": [
+          "energetic"
+        ],
+        "chill": [
+          "calm"
+        ],
+        "angry": [
+          "angry"
+        ],
+        "stressed": [
+          "stressed"
+        ]
+      },
+      "label_names": {
+        "0": "sad",
+        "1": "happy",
+        "2": "energetic",
+        "3": "calm"
+      }
+    },
+    "precision@k": "share of the first k tracks that are relevant",
+    "recall@k": "relevant tracks in the first k / all relevant tracks in the 278k catalog (tens of thousands per target, so recall@30 is tiny by construction)",
+    "ndcg@k": "binary-relevance NDCG; ideal DCG has min(k, |relevant|) relevant tracks at the top",
+    "diversity": "mean pairwise Euclidean distance between a list's tracks in the 9 audio features, each z-scored over the catalog (no genre: the catalog has none)",
+    "duplicates": "repeated track IDs within one list",
+    "mood_consistency": "per target: share of served slots whose track satisfies that target's definition",
+    "classifier_agreement_on_label_targets": "for served tracks whose label is a requested label target, share where the 278k classifier's predicted mood equals the label. Circular: the ranking itself prefers high classifier probability.",
+    "catalog_coverage": "unique tracks served across all evaluation requests / catalog tracks",
+    "stability": "over `runs` requests with different seeds: unique tracks, mean pairwise Jaccard overlap of the lists, and whether the same seed reproduces the same list",
+    "random_catalog_baseline": "uniform random tracks from the whole catalog",
+    "random_eligible_baseline": "the recommender's per-target shares, filled uniformly at random from each target's candidates (the recommender minus its classifier ranking)"
+  },
+  "list_size": 30,
+  "ks": [
+    5,
+    10,
+    20,
+    30
+  ],
+  "runs_per_request": 50,
+  "seed": 2026,
+  "requests": {
+    "happy / match": {
+      "targets": {
+        "happy": {
+          "weight": 1.0,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 106429
+        }
+      },
+      "relevant_tracks_for_request": 106429,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 4.7e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 9.4e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000188,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000282,
+        "ndcg@30": 1.0,
+        "diversity": 2.159812,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.416,
+        "recall@5": 2e-05,
+        "ndcg@5": 0.412381,
+        "precision@10": 0.378,
+        "recall@10": 3.6e-05,
+        "ndcg@10": 0.386077,
+        "precision@20": 0.378,
+        "recall@20": 7.1e-05,
+        "ndcg@20": 0.383271,
+        "precision@30": 0.374667,
+        "recall@30": 0.000106,
+        "ndcg@30": 0.379851,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 4.7e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 9.4e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000188,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000282,
+        "ndcg@30": 1.0,
+        "diversity": 3.077306,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "happy": 1.0
+      },
+      "label_mix_of_served": {
+        "happy": 1.0
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 460,
+        "mean_pairwise_jaccard": 0.0388,
+        "repeat_rate_across_runs": 0.6933,
+        "same_seed_identical": true
+      }
+    },
+    "happy / uplift": {
+      "targets": {
+        "happy": {
+          "weight": 0.625,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 106429
+        },
+        "energetic": {
+          "weight": 0.375,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 47065
+        }
+      },
+      "relevant_tracks_for_request": 153494,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 3.3e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.5e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.00013,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000195,
+        "ndcg@30": 1.0,
+        "diversity": 4.155715,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.552,
+        "recall@5": 1.8e-05,
+        "ndcg@5": 0.549359,
+        "precision@10": 0.528,
+        "recall@10": 3.4e-05,
+        "ndcg@10": 0.53298,
+        "precision@20": 0.541,
+        "recall@20": 7e-05,
+        "ndcg@20": 0.540061,
+        "precision@30": 0.541333,
+        "recall@30": 0.000106,
+        "ndcg@30": 0.540621,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 3.3e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.5e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.00013,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000195,
+        "ndcg@30": 1.0,
+        "diversity": 3.277482,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "happy": 0.6333,
+        "energetic": 0.3667
+      },
+      "label_mix_of_served": {
+        "happy": 0.6333,
+        "energetic": 0.3667
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 478,
+        "mean_pairwise_jaccard": 0.0378,
+        "repeat_rate_across_runs": 0.6813,
+        "same_seed_identical": true
+      }
+    },
+    "sad / match": {
+      "targets": {
+        "sad": {
+          "weight": 1.0,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 82058
+        }
+      },
+      "relevant_tracks_for_request": 82058,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 6.1e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000122,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000244,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000366,
+        "ndcg@30": 1.0,
+        "diversity": 1.405331,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.272,
+        "recall@5": 1.7e-05,
+        "ndcg@5": 0.281157,
+        "precision@10": 0.306,
+        "recall@10": 3.7e-05,
+        "ndcg@10": 0.302587,
+        "precision@20": 0.304,
+        "recall@20": 7.4e-05,
+        "ndcg@20": 0.302466,
+        "precision@30": 0.298667,
+        "recall@30": 0.000109,
+        "ndcg@30": 0.299077,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 6.1e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000122,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000244,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000366,
+        "ndcg@30": 1.0,
+        "diversity": 3.400156,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "sad": 1.0
+      },
+      "label_mix_of_served": {
+        "sad": 1.0
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 445,
+        "mean_pairwise_jaccard": 0.0367,
+        "repeat_rate_across_runs": 0.7033,
+        "same_seed_identical": true
+      }
+    },
+    "sad / uplift": {
+      "targets": {
+        "happy": {
+          "weight": 0.625,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 106429
+        },
+        "calm": {
+          "weight": 0.375,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 42386
+        }
+      },
+      "relevant_tracks_for_request": 148815,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 3.4e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.7e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000134,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000202,
+        "ndcg@30": 1.0,
+        "diversity": 5.598698,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.592,
+        "recall@5": 2e-05,
+        "ndcg@5": 0.581865,
+        "precision@10": 0.544,
+        "recall@10": 3.7e-05,
+        "ndcg@10": 0.55051,
+        "precision@20": 0.533,
+        "recall@20": 7.2e-05,
+        "ndcg@20": 0.540744,
+        "precision@30": 0.534667,
+        "recall@30": 0.000108,
+        "ndcg@30": 0.540153,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 3.4e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.7e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000134,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000202,
+        "ndcg@30": 1.0,
+        "diversity": 4.286448,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "happy": 0.6333,
+        "calm": 0.3667
+      },
+      "label_mix_of_served": {
+        "happy": 0.6333,
+        "calm": 0.3667
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 449,
+        "mean_pairwise_jaccard": 0.039,
+        "repeat_rate_across_runs": 0.7007,
+        "same_seed_identical": true
+      }
+    },
+    "angry / match": {
+      "targets": {
+        "angry": {
+          "weight": 1.0,
+          "relevance": "derived rule",
+          "relevant_tracks_in_catalog": 5706
+        }
+      },
+      "relevant_tracks_for_request": 5706,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 0.000876,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.001753,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.003505,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.005258,
+        "ndcg@30": 1.0,
+        "diversity": 3.180691,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.02,
+        "recall@5": 1.8e-05,
+        "ndcg@5": 0.020768,
+        "precision@10": 0.026,
+        "recall@10": 4.6e-05,
+        "ndcg@10": 0.024705,
+        "precision@20": 0.021,
+        "recall@20": 7.4e-05,
+        "ndcg@20": 0.0216,
+        "precision@30": 0.02,
+        "recall@30": 0.000105,
+        "ndcg@30": 0.0208,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 0.000876,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.001753,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.003505,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.005258,
+        "ndcg@30": 1.0,
+        "diversity": 2.883622,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "angry": 1.0
+      },
+      "label_mix_of_served": {
+        "energetic": 0.8987,
+        "happy": 0.1013
+      },
+      "classifier_agreement_on_label_targets": null,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 452,
+        "mean_pairwise_jaccard": 0.0412,
+        "repeat_rate_across_runs": 0.6987,
+        "same_seed_identical": true
+      }
+    },
+    "angry / uplift": {
+      "targets": {
+        "calm": {
+          "weight": 0.625,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 42386
+        },
+        "happy": {
+          "weight": 0.375,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 106429
+        }
+      },
+      "relevant_tracks_for_request": 148815,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 3.4e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.7e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000134,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000202,
+        "ndcg@30": 1.0,
+        "diversity": 6.20833,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.592,
+        "recall@5": 2e-05,
+        "ndcg@5": 0.581865,
+        "precision@10": 0.544,
+        "recall@10": 3.7e-05,
+        "ndcg@10": 0.55051,
+        "precision@20": 0.533,
+        "recall@20": 7.2e-05,
+        "ndcg@20": 0.540744,
+        "precision@30": 0.534667,
+        "recall@30": 0.000108,
+        "ndcg@30": 0.540153,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 3.4e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.7e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000134,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000202,
+        "ndcg@30": 1.0,
+        "diversity": 4.322494,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "calm": 0.6333,
+        "happy": 0.3667
+      },
+      "label_mix_of_served": {
+        "calm": 0.6333,
+        "happy": 0.3667
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 339,
+        "mean_pairwise_jaccard": 0.0549,
+        "repeat_rate_across_runs": 0.774,
+        "same_seed_identical": true
+      }
+    },
+    "chill / match": {
+      "targets": {
+        "calm": {
+          "weight": 1.0,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 42386
+        }
+      },
+      "relevant_tracks_for_request": 42386,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 0.000118,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000236,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000472,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000708,
+        "ndcg@30": 1.0,
+        "diversity": 4.123192,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.176,
+        "recall@5": 2.1e-05,
+        "ndcg@5": 0.169484,
+        "precision@10": 0.166,
+        "recall@10": 3.9e-05,
+        "ndcg@10": 0.164433,
+        "precision@20": 0.155,
+        "recall@20": 7.3e-05,
+        "ndcg@20": 0.157473,
+        "precision@30": 0.16,
+        "recall@30": 0.000113,
+        "ndcg@30": 0.160302,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 0.000118,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000236,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000472,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000708,
+        "ndcg@30": 1.0,
+        "diversity": 3.158599,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "calm": 1.0
+      },
+      "label_mix_of_served": {
+        "calm": 1.0
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 210,
+        "mean_pairwise_jaccard": 0.0986,
+        "repeat_rate_across_runs": 0.86,
+        "same_seed_identical": true
+      }
+    },
+    "chill / uplift": {
+      "targets": {
+        "energetic": {
+          "weight": 0.625,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 47065
+        },
+        "calm": {
+          "weight": 0.375,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 42386
+        }
+      },
+      "relevant_tracks_for_request": 89451,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 5.6e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000112,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000224,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000335,
+        "ndcg@30": 1.0,
+        "diversity": 5.815775,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.312,
+        "recall@5": 1.7e-05,
+        "ndcg@5": 0.306462,
+        "precision@10": 0.316,
+        "recall@10": 3.5e-05,
+        "ndcg@10": 0.311335,
+        "precision@20": 0.318,
+        "recall@20": 7.1e-05,
+        "ndcg@20": 0.314264,
+        "precision@30": 0.326667,
+        "recall@30": 0.00011,
+        "ndcg@30": 0.321072,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 5.6e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000112,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000224,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000335,
+        "ndcg@30": 1.0,
+        "diversity": 4.340389,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "energetic": 0.6333,
+        "calm": 0.3667
+      },
+      "label_mix_of_served": {
+        "energetic": 0.6333,
+        "calm": 0.3667
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 463,
+        "mean_pairwise_jaccard": 0.0347,
+        "repeat_rate_across_runs": 0.6913,
+        "same_seed_identical": true
+      }
+    },
+    "energetic / match": {
+      "targets": {
+        "energetic": {
+          "weight": 1.0,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 47065
+        }
+      },
+      "relevant_tracks_for_request": 47065,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 0.000106,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000212,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000425,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000637,
+        "ndcg@30": 1.0,
+        "diversity": 2.920041,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.136,
+        "recall@5": 1.4e-05,
+        "ndcg@5": 0.136978,
+        "precision@10": 0.15,
+        "recall@10": 3.2e-05,
+        "ndcg@10": 0.146902,
+        "precision@20": 0.163,
+        "recall@20": 6.9e-05,
+        "ndcg@20": 0.15679,
+        "precision@30": 0.166667,
+        "recall@30": 0.000106,
+        "ndcg@30": 0.16077,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 0.000106,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000212,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000425,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000637,
+        "ndcg@30": 1.0,
+        "diversity": 3.10646,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "energetic": 1.0
+      },
+      "label_mix_of_served": {
+        "energetic": 1.0
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 478,
+        "mean_pairwise_jaccard": 0.0372,
+        "repeat_rate_across_runs": 0.6813,
+        "same_seed_identical": true
+      }
+    },
+    "energetic / uplift": {
+      "targets": {
+        "energetic": {
+          "weight": 0.625,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 47065
+        },
+        "happy": {
+          "weight": 0.375,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 106429
+        }
+      },
+      "relevant_tracks_for_request": 153494,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 3.3e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.5e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.00013,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000195,
+        "ndcg@30": 1.0,
+        "diversity": 4.304594,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.552,
+        "recall@5": 1.8e-05,
+        "ndcg@5": 0.549359,
+        "precision@10": 0.528,
+        "recall@10": 3.4e-05,
+        "ndcg@10": 0.53298,
+        "precision@20": 0.541,
+        "recall@20": 7e-05,
+        "ndcg@20": 0.540061,
+        "precision@30": 0.541333,
+        "recall@30": 0.000106,
+        "ndcg@30": 0.540621,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 3.3e-05,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 6.5e-05,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.00013,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000195,
+        "ndcg@30": 1.0,
+        "diversity": 3.270301,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "energetic": 0.6333,
+        "happy": 0.3667
+      },
+      "label_mix_of_served": {
+        "energetic": 0.6333,
+        "happy": 0.3667
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 473,
+        "mean_pairwise_jaccard": 0.0376,
+        "repeat_rate_across_runs": 0.6847,
+        "same_seed_identical": true
+      }
+    },
+    "stressed / match": {
+      "targets": {
+        "stressed": {
+          "weight": 1.0,
+          "relevance": "derived (experimental rule)",
+          "relevant_tracks_in_catalog": 8956
+        }
+      },
+      "relevant_tracks_for_request": 8956,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 0.000558,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.001117,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.002233,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.00335,
+        "ndcg@30": 1.0,
+        "diversity": 2.459425,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.036,
+        "recall@5": 2e-05,
+        "ndcg@5": 0.032276,
+        "precision@10": 0.03,
+        "recall@10": 3.3e-05,
+        "ndcg@10": 0.029044,
+        "precision@20": 0.027,
+        "recall@20": 6e-05,
+        "ndcg@20": 0.027441,
+        "precision@30": 0.03,
+        "recall@30": 0.0001,
+        "ndcg@30": 0.029469,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 0.000558,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.001117,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.002233,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.00335,
+        "ndcg@30": 1.0,
+        "diversity": 2.80696,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "stressed": 1.0
+      },
+      "label_mix_of_served": {
+        "sad": 0.5053,
+        "happy": 0.3413,
+        "energetic": 0.1533
+      },
+      "classifier_agreement_on_label_targets": null,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 450,
+        "mean_pairwise_jaccard": 0.0415,
+        "repeat_rate_across_runs": 0.7,
+        "same_seed_identical": true
+      }
+    },
+    "stressed / uplift": {
+      "targets": {
+        "calm": {
+          "weight": 1.0,
+          "relevance": "dataset label",
+          "relevant_tracks_in_catalog": 42386
+        }
+      },
+      "relevant_tracks_for_request": 42386,
+      "moodcast": {
+        "precision@5": 1.0,
+        "recall@5": 0.000118,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000236,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000472,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000708,
+        "ndcg@30": 1.0,
+        "diversity": 4.123192,
+        "duplicates": 0.0
+      },
+      "random_catalog_baseline": {
+        "precision@5": 0.176,
+        "recall@5": 2.1e-05,
+        "ndcg@5": 0.169484,
+        "precision@10": 0.166,
+        "recall@10": 3.9e-05,
+        "ndcg@10": 0.164433,
+        "precision@20": 0.155,
+        "recall@20": 7.3e-05,
+        "ndcg@20": 0.157473,
+        "precision@30": 0.16,
+        "recall@30": 0.000113,
+        "ndcg@30": 0.160302,
+        "diversity": 4.024188,
+        "duplicates": 0.0
+      },
+      "random_eligible_baseline": {
+        "precision@5": 1.0,
+        "recall@5": 0.000118,
+        "ndcg@5": 1.0,
+        "precision@10": 1.0,
+        "recall@10": 0.000236,
+        "ndcg@10": 1.0,
+        "precision@20": 1.0,
+        "recall@20": 0.000472,
+        "ndcg@20": 1.0,
+        "precision@30": 1.0,
+        "recall@30": 0.000708,
+        "ndcg@30": 1.0,
+        "diversity": 3.158599,
+        "duplicates": 0.0
+      },
+      "mood_consistency": {
+        "calm": 1.0
+      },
+      "label_mix_of_served": {
+        "calm": 1.0
+      },
+      "classifier_agreement_on_label_targets": 1.0,
+      "stability": {
+        "runs": 50,
+        "unique_tracks_over_runs": 210,
+        "mean_pairwise_jaccard": 0.0986,
+        "repeat_rate_across_runs": 0.86,
+        "same_seed_identical": true
+      }
+    }
+  },
+  "overall_mean_over_requests": {
+    "moodcast": {
+      "precision@5": 1.0,
+      "recall@5": 0.000173,
+      "ndcg@5": 1.0,
+      "precision@10": 1.0,
+      "recall@10": 0.000346,
+      "ndcg@10": 1.0,
+      "precision@20": 1.0,
+      "recall@20": 0.000691,
+      "ndcg@20": 1.0,
+      "precision@30": 1.0,
+      "recall@30": 0.001037,
+      "ndcg@30": 1.0,
+      "diversity": 3.871233,
+      "duplicates": 0.0
+    },
+    "random_catalog_baseline": {
+      "precision@5": 0.319333,
+      "recall@5": 1.9e-05,
+      "ndcg@5": 0.315953,
+      "precision@10": 0.306833,
+      "recall@10": 3.7e-05,
+      "ndcg@10": 0.308041,
+      "precision@20": 0.30575,
+      "recall@20": 7.1e-05,
+      "ndcg@20": 0.306866,
+      "precision@30": 0.307389,
+      "recall@30": 0.000108,
+      "ndcg@30": 0.307766,
+      "diversity": 4.024188,
+      "duplicates": 0.0
+    },
+    "random_eligible_baseline": {
+      "precision@5": 1.0,
+      "recall@5": 0.000173,
+      "ndcg@5": 1.0,
+      "precision@10": 1.0,
+      "recall@10": 0.000346,
+      "ndcg@10": 1.0,
+      "precision@20": 1.0,
+      "recall@20": 0.000691,
+      "ndcg@20": 1.0,
+      "precision@30": 1.0,
+      "recall@30": 0.001037,
+      "ndcg@30": 1.0,
+      "diversity": 3.424068,
+      "duplicates": 0.0
+    }
+  },
+  "catalog_coverage": {
+    "unique_tracks_served": 2471,
+    "catalog_tracks": 277938,
+    "coverage": 0.00889,
+    "recommendation_slots": 18000,
+    "by_mood": {
+      "happy": {
+        "unique_tracks_served": 654,
+        "coverage": 0.002353
+      },
+      "sad": {
+        "unique_tracks_served": 894,
+        "coverage": 0.003217
+      },
+      "angry": {
+        "unique_tracks_served": 791,
+        "coverage": 0.002846
+      },
+      "chill": {
+        "unique_tracks_served": 521,
+        "coverage": 0.001875
+      },
+      "energetic": {
+        "unique_tracks_served": 660,
+        "coverage": 0.002375
+      },
+      "stressed": {
+        "unique_tracks_served": 660,
+        "coverage": 0.002375
+      }
+    }
+  },
+  "performance": {
+    "catalog_csv_load_s": 0.68,
+    "catalog_load_peak_traced_memory_mb": 183.9,
+    "catalog_in_memory_mb": 90.3,
+    "recommend_music_latency_ms": {
+      "median": 2.28,
+      "p95": 4.17,
+      "calls": 600
+    },
+    "evaluation_runtime_s": 8.5
+  },
+  "limitations": [
+    "Precision/NDCG against the label/rule definitions are 1.0 by construction: the recommender only selects candidates from those sets. They verify the gating, not whether users would like the tracks.",
+    "No human relevance judgments, listening data or user feedback exist for this catalog; this is an offline, label-consistency evaluation only.",
+    "Base-mood labels are inherited from the Moodify dataset and described there as model-generated.",
+    "angry is a derived feature rule; stressed is a derived, experimental rule; chill is an application mapping to the calm label. None of them is ground truth.",
+    "Recall@K over a 278k catalog is bounded by K / |relevant| and is near zero for any list of 30.",
+    "Classifier agreement is circular (the ranking prefers high classifier probability).",
+    "The classifier's 83.5% held-out accuracy measures label prediction, not recommendation quality."
+  ]
+}

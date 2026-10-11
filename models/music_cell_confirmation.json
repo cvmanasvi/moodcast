@@ -1,0 +1,2833 @@
+{
+  "analysis_only": true,
+  "evaluation_date": "2026-10-09",
+  "script_sha256": "ad01a537f3f02911006b8a89f85614b029b3bfb788d2edfc628e85d874dbcc2c",
+  "phase_2j_script_sha256": "d7488e68192fdc4bcf46008240778264fc6ba04f4a1d352fd8bd14c68d139427",
+  "source_artifact_sha256": {
+    "catalog": "a261afeea3b11859cd5a8cdb65fc12402a08b8dc4e684b670c791c0dd2af9a6a",
+    "classifier": "09b653bfd0cf48c44df1ad2d2d07c851bd617950b19a1546573eeb0f607540d1"
+  },
+  "production_configuration": {
+    "pool_multiplier": 20,
+    "weighting": "current"
+  },
+  "hypothesis": "applying Phase 2J's fixed feature-cell sampling only to base-label single-target requests (happy, sad, calm, energetic) improves within-mood diversity while avoiding Phase 2J's angry/stressed regression and uplift whole-list diversity loss.",
+  "preregistration": {
+    "routing": "T uses Phase 2J strategy S (30 fixed PCA feature cells per target, one production-weighted pick among each chosen cell's 20 most confident available tracks, calm guard) only when the request has exactly one target and it is happy, sad, calm or energetic; every other request is served by G unchanged.",
+    "reference": "G (production + calm guard). Unguarded production is reported alongside.",
+    "gates_resolved": [
+      "Single-target gates use within-target diversity (equal to list diversity for one target).",
+      "Calm speech-like share must be <= 0.20 and <= unguarded production's share on the same seeds.",
+      "Configurations where T routes to G (angry, stressed, all five multi-target mixes) have paired differences of exactly 0: they count as 'lower bound not > 0' for the 4-of-6 count and pass the no-regression and non-inferiority gates.",
+      "The legacy mean classifier probability >= 0.99 is reported, not applied.",
+      "Within-target diversity of multi-target requests is reported as a diagnostic only."
+    ],
+    "seeds": "Gates are decided on 30000-30049. 33000-33049 is a replication set: it is reported, and any gate it fails is flagged as not replicated. Both are disjoint from every earlier seed set.",
+    "uncertainty": "Paired per-seed differences against G; 2,000-sample percentile bootstrap over 50 runs (family means bootstrap the per-run family mean). Sampling variability on one catalog only."
+  },
+  "gates": {
+    "integrity": "100% target consistency, exact shares in every list, same-seed determinism on all 12 requests",
+    "single_family_mean_gain_lower_bound_gt": 0.0,
+    "single_family_configs_with_lower_bound_gt_0_min": 4,
+    "single_config_regression_upper_bound_lt": -0.1,
+    "multi_family_mean_change_lower_bound_gt": -0.1,
+    "multi_config_change_lower_bound_gt": -0.25,
+    "min_classifier_agreement_base_label_slots": 0.95,
+    "min_mean_classifier_probability_base_label_slots": 0.95,
+    "min_catalog_unique_tracks": 2000,
+    "max_mean_repeat_rate": 0.75,
+    "max_latency_p95_ms": 25.0,
+    "max_calm_speech_like_share": 0.2,
+    "calm_speech_like_not_worse_than_production": true
+  },
+  "seeds": {
+    "primary": "30000..30049",
+    "replication": "33000..33049",
+    "previously_used": {
+      "tests and cold-start probes": "0..49",
+      "Phase 2H.6 API test": "2024..2024",
+      "exploratory (2H.5-2I)": "2026..2075",
+      "held-out (2H.7-2H.8)": "7000..7049",
+      "third set (2H.8.1)": "12000..12049",
+      "fourth set (2H.9)": "15000..15049",
+      "held-out (2I)": "18000..18049",
+      "confirmation (2I.1)": "21000..21049",
+      "primary (2J)": "24000..24049",
+      "replication (2J)": "27000..27049"
+    },
+    "disjoint": true,
+    "runs_per_request": 50,
+    "bootstrap_rng": 0
+  },
+  "configurations": {
+    "single_target": {
+      "happy:30": [
+        "happy / match"
+      ],
+      "sad:30": [
+        "sad / match"
+      ],
+      "angry:30": [
+        "angry / match"
+      ],
+      "calm:30": [
+        "chill / match",
+        "stressed / uplift"
+      ],
+      "energetic:30": [
+        "energetic / match"
+      ],
+      "stressed:30": [
+        "stressed / match"
+      ]
+    },
+    "multi_target": {
+      "happy:19 + energetic:11": [
+        "happy / uplift"
+      ],
+      "happy:19 + calm:11": [
+        "sad / uplift"
+      ],
+      "calm:19 + happy:11": [
+        "angry / uplift"
+      ],
+      "energetic:19 + calm:11": [
+        "chill / uplift"
+      ],
+      "energetic:19 + happy:11": [
+        "energetic / uplift"
+      ]
+    }
+  },
+  "routing": {
+    "happy:30": "cells",
+    "sad:30": "cells",
+    "angry:30": "G",
+    "calm:30": "cells",
+    "energetic:30": "cells",
+    "stressed:30": "G",
+    "happy:19 + energetic:11": "G",
+    "happy:19 + calm:11": "G",
+    "calm:19 + happy:11": "G",
+    "energetic:19 + calm:11": "G",
+    "energetic:19 + happy:11": "G"
+  },
+  "measurement_validity": {
+    "measured_facts": [
+      "Which tracks are served, their dataset label / derived-rule membership, exact target shares, repeat rate, unique-track coverage, determinism and latency in this harness.",
+      "Audio-feature values (Spotify-derived) and the classifier's probabilities for served tracks."
+    ],
+    "proxies": [
+      "Feature-space diversity (mean pairwise distance in 9 z-scored audio features) is a proxy for variety; it is not listener-perceived variety and is inflated by outliers such as speech-like tracks.",
+      "Classifier probability and agreement are proxies for mood relevance; the classifier was trained on the same model-generated labels and the ranking optimises its probability, so they are not independent.",
+      "Target consistency is circular: candidates are filtered by the same label/rule that defines relevance.",
+      "Typicality (distance to the target's eligible centroid) describes where in the mood's feature distribution picks come from; whether central or extreme tracks are 'better' is not measured."
+    ],
+    "assumptions": [
+      "The Moodify labels (model-generated, CC BY 4.0) are an acceptable definition of each base mood.",
+      "Angry and stressed percentile rules define those moods (stressed is experimental).",
+      "More within-mood variety at constant relevance is desirable; no user data confirms this."
+    ],
+    "not_measured": "No human relevance judgments, listening data, skips, likes or A/B outcomes exist for this catalog; nothing here measures listener satisfaction."
+  },
+  "primary": {
+    "P: production": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2437,
+        "mean_repeat_rate": 0.7341,
+        "mean_diversity": 3.8537,
+        "single_target_mean_diversity": 3.8537,
+        "single_target_requests_at_least_random_eligible": 8,
+        "requests_at_least_random_eligible": 8,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9928,
+        "latency_ms": {
+          "median": 2.57,
+          "p95": 5.86,
+          "max": 7.65
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 6.27,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.56,
+          "p95_ms": 5.83,
+          "max_ms": 7.63
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0033,
+          "sad / match": 0.0,
+          "sad / uplift": 0.062,
+          "angry / match": 0.0067,
+          "angry / uplift": 0.1227,
+          "chill / match": 0.1947,
+          "chill / uplift": 0.068,
+          "energetic / match": 0.014,
+          "energetic / uplift": 0.008,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.1947
+        },
+        "calm_requests": 0.1947
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9959,
+            "p5_probability": 0.9939,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9942,
+            "min_probability": 0.9926,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.1002,
+          "within_target_diversity": 2.1002,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0616,
+          "typicality_by_target": {
+            "happy": 1.0907
+          },
+          "unique_tracks_over_runs": 459,
+          "repeat_rate": 0.694,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 1.3714,
+          "within_target_diversity": 1.3714,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.4191,
+          "typicality_by_target": {
+            "sad": 1.1757
+          },
+          "unique_tracks_over_runs": 443,
+          "repeat_rate": 0.7047,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.1898,
+          "within_target_diversity": 3.1898,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.9124,
+          "typicality_by_target": {
+            "angry": 1.1642
+          },
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.0653,
+          "within_target_diversity": 4.0653,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1832,
+          "typicality_by_target": {
+            "calm": 2.1159
+          },
+          "unique_tracks_over_runs": 194,
+          "repeat_rate": 0.8707,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.9303,
+          "within_target_diversity": 2.9303,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0814,
+          "typicality_by_target": {
+            "energetic": 1.5803
+          },
+          "unique_tracks_over_runs": 475,
+          "repeat_rate": 0.6833,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4269,
+          "within_target_diversity": 2.4269,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.7721,
+          "typicality_by_target": {
+            "stressed": 0.8877
+          },
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1678,
+          "within_target_diversity": 2.3506,
+          "between_target_separation": 6.1329,
+          "random_eligible_list_diversity": 3.2448,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "energetic": 1.7139
+          },
+          "unique_tracks_over_runs": 463,
+          "repeat_rate": 0.6913,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.5925,
+          "within_target_diversity": 2.5808,
+          "between_target_separation": 8.8492,
+          "random_eligible_list_diversity": 4.2484,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "calm": 2.0769
+          },
+          "unique_tracks_over_runs": 446,
+          "repeat_rate": 0.7027,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 6.15,
+          "within_target_diversity": 3.5695,
+          "between_target_separation": 8.9405,
+          "random_eligible_list_diversity": 4.2515,
+          "typicality_by_target": {
+            "calm": 2.1139,
+            "happy": 1.1292
+          },
+          "unique_tracks_over_runs": 320,
+          "repeat_rate": 0.7867,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.8569,
+          "within_target_diversity": 3.1897,
+          "between_target_separation": 8.741,
+          "random_eligible_list_diversity": 4.2942,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "calm": 2.0588
+          },
+          "unique_tracks_over_runs": 449,
+          "repeat_rate": 0.7007,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3277,
+          "within_target_diversity": 2.7362,
+          "between_target_separation": 6.0487,
+          "random_eligible_list_diversity": 3.2539,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "happy": 1.129
+          },
+          "unique_tracks_over_runs": 443,
+          "repeat_rate": 0.7047,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 1.4339,
+            "ci95": [
+              1.2777,
+              1.5747
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.4339,
+            "ci95": [
+              1.2728,
+              1.5838
+            ]
+          }
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.1794,
+            "ci95": [
+              0.1328,
+              0.2275
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2957,
+            "ci95": [
+              0.2225,
+              0.3701
+            ]
+          }
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.6236,
+            "ci95": [
+              0.5382,
+              0.7121
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.1002,
+            "ci95": [
+              0.951,
+              1.2547
+            ]
+          }
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.1887,
+            "ci95": [
+              0.1441,
+              0.2314
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2717,
+            "ci95": [
+              0.2021,
+              0.3366
+            ]
+          }
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.239,
+          "ci95": [
+            0.2135,
+            0.2632
+          ]
+        },
+        "multi": {
+          "mean": 0.1984,
+          "ci95": [
+            0.1741,
+            0.221
+          ]
+        },
+        "multi_within_diagnostic": {
+          "mean": 0.3335,
+          "ci95": [
+            0.2967,
+            0.3689
+          ]
+        }
+      },
+      "gates": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "FAIL",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "G: production + calm guard": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2422,
+        "mean_repeat_rate": 0.7407,
+        "mean_diversity": 3.5321,
+        "single_target_mean_diversity": 3.5321,
+        "single_target_requests_at_least_random_eligible": 6,
+        "requests_at_least_random_eligible": 6,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9928,
+        "latency_ms": {
+          "median": 2.62,
+          "p95": 6.27,
+          "max": 8.24
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 4.71,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.61,
+          "p95_ms": 6.26,
+          "max_ms": 8.22
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0033,
+          "sad / match": 0.0,
+          "sad / uplift": 0.0,
+          "angry / match": 0.0067,
+          "angry / uplift": 0.0,
+          "chill / match": 0.0,
+          "chill / uplift": 0.008,
+          "energetic / match": 0.014,
+          "energetic / uplift": 0.008,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9959,
+            "p5_probability": 0.9939,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9942,
+            "min_probability": 0.9926,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.1002,
+          "within_target_diversity": 2.1002,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0616,
+          "typicality_by_target": {
+            "happy": 1.0907
+          },
+          "unique_tracks_over_runs": 459,
+          "repeat_rate": 0.694,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 1.3714,
+          "within_target_diversity": 1.3714,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.4191,
+          "typicality_by_target": {
+            "sad": 1.1757
+          },
+          "unique_tracks_over_runs": 443,
+          "repeat_rate": 0.7047,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.1898,
+          "within_target_diversity": 3.1898,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.9124,
+          "typicality_by_target": {
+            "angry": 1.1642
+          },
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.6314,
+          "within_target_diversity": 2.6314,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1832,
+          "typicality_by_target": {
+            "calm": 1.8018
+          },
+          "unique_tracks_over_runs": 175,
+          "repeat_rate": 0.8833,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.9303,
+          "within_target_diversity": 2.9303,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0814,
+          "typicality_by_target": {
+            "energetic": 1.5803
+          },
+          "unique_tracks_over_runs": 475,
+          "repeat_rate": 0.6833,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4269,
+          "within_target_diversity": 2.4269,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.7721,
+          "typicality_by_target": {
+            "stressed": 0.8877
+          },
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1678,
+          "within_target_diversity": 2.3506,
+          "between_target_separation": 6.1329,
+          "random_eligible_list_diversity": 3.2448,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "energetic": 1.7139
+          },
+          "unique_tracks_over_runs": 463,
+          "repeat_rate": 0.6913,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.4131,
+          "within_target_diversity": 2.2851,
+          "between_target_separation": 8.7956,
+          "random_eligible_list_diversity": 4.2484,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "calm": 1.8264
+          },
+          "unique_tracks_over_runs": 419,
+          "repeat_rate": 0.7207,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.5264,
+          "within_target_diversity": 2.4693,
+          "between_target_separation": 8.8322,
+          "random_eligible_list_diversity": 4.2515,
+          "typicality_by_target": {
+            "calm": 1.807,
+            "happy": 1.136
+          },
+          "unique_tracks_over_runs": 294,
+          "repeat_rate": 0.804,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.6681,
+          "within_target_diversity": 2.918,
+          "between_target_separation": 8.642,
+          "random_eligible_list_diversity": 4.2942,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "calm": 1.8339
+          },
+          "unique_tracks_over_runs": 421,
+          "repeat_rate": 0.7193,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3277,
+          "within_target_diversity": 2.7362,
+          "between_target_separation": 6.0487,
+          "random_eligible_list_diversity": 3.2539,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "happy": 1.129
+          },
+          "unique_tracks_over_runs": 443,
+          "repeat_rate": 0.7047,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "gates": null
+    },
+    "T: cells for base-label single-target, else G": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2982,
+        "mean_repeat_rate": 0.7182,
+        "mean_diversity": 3.9782,
+        "single_target_mean_diversity": 3.9782,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 2.86,
+          "p95": 5.06,
+          "max": 6.67
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.98,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.84,
+          "p95_ms": 5.05,
+          "max_ms": 6.66
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0033,
+          "sad / match": 0.0,
+          "sad / uplift": 0.0,
+          "angry / match": 0.0067,
+          "angry / uplift": 0.0,
+          "chill / match": 0.0,
+          "chill / uplift": 0.008,
+          "energetic / match": 0.0047,
+          "energetic / uplift": 0.008,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9819,
+            "p5_probability": 0.8953,
+            "min_probability": 0.8152,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9857,
+            "min_probability": 0.9517,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9877,
+            "p5_probability": 0.943,
+            "min_probability": 0.8186,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9992,
+            "p5_probability": 0.9964,
+            "min_probability": 0.9737,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9931,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 2.3581,
+          "within_target_diversity": 2.3581,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0616,
+          "typicality_by_target": {
+            "happy": 1.1051
+          },
+          "unique_tracks_over_runs": 451,
+          "repeat_rate": 0.6993,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.6356,
+          "within_target_diversity": 3.6356,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.4191,
+          "typicality_by_target": {
+            "sad": 1.4641
+          },
+          "unique_tracks_over_runs": 413,
+          "repeat_rate": 0.7247,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.1898,
+          "within_target_diversity": 3.1898,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.9124,
+          "typicality_by_target": {
+            "angry": 1.1642
+          },
+          "unique_tracks_over_runs": 444,
+          "repeat_rate": 0.704,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.9146,
+          "within_target_diversity": 3.9146,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1832,
+          "typicality_by_target": {
+            "calm": 1.6125
+          },
+          "unique_tracks_over_runs": 411,
+          "repeat_rate": 0.726,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.1961,
+          "within_target_diversity": 3.1961,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.0814,
+          "typicality_by_target": {
+            "energetic": 1.3219
+          },
+          "unique_tracks_over_runs": 446,
+          "repeat_rate": 0.7027,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4269,
+          "within_target_diversity": 2.4269,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.7721,
+          "typicality_by_target": {
+            "stressed": 0.8877
+          },
+          "unique_tracks_over_runs": 457,
+          "repeat_rate": 0.6953,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1678,
+          "within_target_diversity": 2.3506,
+          "between_target_separation": 6.1329,
+          "random_eligible_list_diversity": 3.2448,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "energetic": 1.7139
+          },
+          "unique_tracks_over_runs": 463,
+          "repeat_rate": 0.6913,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.4131,
+          "within_target_diversity": 2.2851,
+          "between_target_separation": 8.7956,
+          "random_eligible_list_diversity": 4.2484,
+          "typicality_by_target": {
+            "happy": 1.1203,
+            "calm": 1.8264
+          },
+          "unique_tracks_over_runs": 419,
+          "repeat_rate": 0.7207,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.5264,
+          "within_target_diversity": 2.4693,
+          "between_target_separation": 8.8322,
+          "random_eligible_list_diversity": 4.2515,
+          "typicality_by_target": {
+            "calm": 1.807,
+            "happy": 1.136
+          },
+          "unique_tracks_over_runs": 294,
+          "repeat_rate": 0.804,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.6681,
+          "within_target_diversity": 2.918,
+          "between_target_separation": 8.642,
+          "random_eligible_list_diversity": 4.2942,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "calm": 1.8339
+          },
+          "unique_tracks_over_runs": 421,
+          "repeat_rate": 0.7193,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3277,
+          "within_target_diversity": 2.7362,
+          "between_target_separation": 6.0487,
+          "random_eligible_list_diversity": 3.2539,
+          "typicality_by_target": {
+            "energetic": 1.6338,
+            "happy": 1.129
+          },
+          "unique_tracks_over_runs": 443,
+          "repeat_rate": 0.7047,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.2579,
+            "ci95": [
+              0.208,
+              0.3101
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2579,
+            "ci95": [
+              0.2094,
+              0.3124
+            ]
+          }
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.2642,
+            "ci95": [
+              2.2025,
+              2.3209
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.2642,
+            "ci95": [
+              2.2063,
+              2.319
+            ]
+          }
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 1.2832,
+            "ci95": [
+              1.1928,
+              1.3772
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.2832,
+            "ci95": [
+              1.1899,
+              1.3806
+            ]
+          }
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.2658,
+            "ci95": [
+              0.1641,
+              0.3618
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2658,
+            "ci95": [
+              0.1642,
+              0.366
+            ]
+          }
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.6785,
+          "ci95": [
+            0.6538,
+            0.7031
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "multi_within_diagnostic": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "gates": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "PASS",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    }
+  },
+  "replication": {
+    "P: production": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2484,
+        "mean_repeat_rate": 0.7264,
+        "mean_diversity": 3.8622,
+        "single_target_mean_diversity": 3.8622,
+        "single_target_requests_at_least_random_eligible": 8,
+        "requests_at_least_random_eligible": 8,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9928,
+        "latency_ms": {
+          "median": 2.27,
+          "p95": 5.35,
+          "max": 7.54
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 3.04,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.27,
+          "p95_ms": 5.38,
+          "max_ms": 7.52
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0053,
+          "sad / match": 0.0,
+          "sad / uplift": 0.08,
+          "angry / match": 0.002,
+          "angry / uplift": 0.1273,
+          "chill / match": 0.1993,
+          "chill / uplift": 0.0873,
+          "energetic / match": 0.0133,
+          "energetic / uplift": 0.0067,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.1993
+        },
+        "calm_requests": 0.1993
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9958,
+            "p5_probability": 0.9939,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9942,
+            "min_probability": 0.9926,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.1322,
+          "within_target_diversity": 2.1322,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1331,
+          "typicality_by_target": {
+            "happy": 1.0943
+          },
+          "unique_tracks_over_runs": 470,
+          "repeat_rate": 0.6867,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 1.41,
+          "within_target_diversity": 1.41,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.3495,
+          "typicality_by_target": {
+            "sad": 1.1805
+          },
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.2108,
+          "within_target_diversity": 3.2108,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.8899,
+          "typicality_by_target": {
+            "angry": 1.167
+          },
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.048,
+          "within_target_diversity": 4.048,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1579,
+          "typicality_by_target": {
+            "calm": 2.1076
+          },
+          "unique_tracks_over_runs": 203,
+          "repeat_rate": 0.8647,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.8989,
+          "within_target_diversity": 2.8989,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1393,
+          "typicality_by_target": {
+            "energetic": 1.5644
+          },
+          "unique_tracks_over_runs": 473,
+          "repeat_rate": 0.6847,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4342,
+          "within_target_diversity": 2.4342,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.85,
+          "typicality_by_target": {
+            "stressed": 0.8934
+          },
+          "unique_tracks_over_runs": 458,
+          "repeat_rate": 0.6947,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1599,
+          "within_target_diversity": 2.3447,
+          "between_target_separation": 6.1228,
+          "random_eligible_list_diversity": 3.306,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "energetic": 1.69
+          },
+          "unique_tracks_over_runs": 484,
+          "repeat_rate": 0.6773,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.6382,
+          "within_target_diversity": 2.6499,
+          "between_target_separation": 8.8695,
+          "random_eligible_list_diversity": 4.2672,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "calm": 2.1374
+          },
+          "unique_tracks_over_runs": 454,
+          "repeat_rate": 0.6973,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 6.1725,
+          "within_target_diversity": 3.6197,
+          "between_target_separation": 8.933,
+          "random_eligible_list_diversity": 4.2559,
+          "typicality_by_target": {
+            "calm": 2.1271,
+            "happy": 1.1384
+          },
+          "unique_tracks_over_runs": 343,
+          "repeat_rate": 0.7713,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.8841,
+          "within_target_diversity": 3.235,
+          "between_target_separation": 8.7486,
+          "random_eligible_list_diversity": 4.3518,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "calm": 2.1451
+          },
+          "unique_tracks_over_runs": 456,
+          "repeat_rate": 0.696,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3096,
+          "within_target_diversity": 2.7265,
+          "between_target_separation": 6.0214,
+          "random_eligible_list_diversity": 3.22,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "happy": 1.1367
+          },
+          "unique_tracks_over_runs": 469,
+          "repeat_rate": 0.6873,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 1.401,
+            "ci95": [
+              1.2445,
+              1.5605
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.401,
+            "ci95": [
+              1.2379,
+              1.5542
+            ]
+          }
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.2423,
+            "ci95": [
+              0.1905,
+              0.2929
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.38,
+            "ci95": [
+              0.3126,
+              0.4477
+            ]
+          }
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.6166,
+            "ci95": [
+              0.5336,
+              0.6993
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.0778,
+            "ci95": [
+              0.9261,
+              1.2239
+            ]
+          }
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.2432,
+            "ci95": [
+              0.1945,
+              0.2895
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3867,
+            "ci95": [
+              0.3223,
+              0.449
+            ]
+          }
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.2335,
+          "ci95": [
+            0.207,
+            0.2602
+          ]
+        },
+        "multi": {
+          "mean": 0.2204,
+          "ci95": [
+            0.193,
+            0.2472
+          ]
+        },
+        "multi_within_diagnostic": {
+          "mean": 0.3689,
+          "ci95": [
+            0.3253,
+            0.4128
+          ]
+        }
+      },
+      "gates": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "FAIL",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    },
+    "G: production + calm guard": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 2471,
+        "mean_repeat_rate": 0.733,
+        "mean_diversity": 3.5368,
+        "single_target_mean_diversity": 3.5368,
+        "single_target_requests_at_least_random_eligible": 6,
+        "requests_at_least_random_eligible": 6,
+        "mean_ranking_signal_of_served": 0.9928,
+        "single_target_mean_ranking_signal": 0.9928,
+        "latency_ms": {
+          "median": 2.37,
+          "p95": 5.53,
+          "max": 6.89
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.78,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.37,
+          "p95_ms": 5.51,
+          "max_ms": 6.87
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0053,
+          "sad / match": 0.0,
+          "sad / uplift": 0.0,
+          "angry / match": 0.002,
+          "angry / uplift": 0.0,
+          "chill / match": 0.0,
+          "chill / uplift": 0.0067,
+          "energetic / match": 0.0133,
+          "energetic / uplift": 0.0067,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9998,
+            "p5_probability": 0.9998,
+            "min_probability": 0.9997,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9958,
+            "p5_probability": 0.9939,
+            "min_probability": 0.9928,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9966,
+            "p5_probability": 0.9942,
+            "min_probability": 0.9926,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 1.0,
+            "p5_probability": 1.0,
+            "min_probability": 0.9999,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.9978,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.1322,
+          "within_target_diversity": 2.1322,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1331,
+          "typicality_by_target": {
+            "happy": 1.0943
+          },
+          "unique_tracks_over_runs": 470,
+          "repeat_rate": 0.6867,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 1.41,
+          "within_target_diversity": 1.41,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.3495,
+          "typicality_by_target": {
+            "sad": 1.1805
+          },
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.2108,
+          "within_target_diversity": 3.2108,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.8899,
+          "typicality_by_target": {
+            "angry": 1.167
+          },
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.6469,
+          "within_target_diversity": 2.6469,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1579,
+          "typicality_by_target": {
+            "calm": 1.8093
+          },
+          "unique_tracks_over_runs": 187,
+          "repeat_rate": 0.8753,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.8989,
+          "within_target_diversity": 2.8989,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1393,
+          "typicality_by_target": {
+            "energetic": 1.5644
+          },
+          "unique_tracks_over_runs": 473,
+          "repeat_rate": 0.6847,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4342,
+          "within_target_diversity": 2.4342,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.85,
+          "typicality_by_target": {
+            "stressed": 0.8934
+          },
+          "unique_tracks_over_runs": 458,
+          "repeat_rate": 0.6947,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1599,
+          "within_target_diversity": 2.3447,
+          "between_target_separation": 6.1228,
+          "random_eligible_list_diversity": 3.306,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "energetic": 1.69
+          },
+          "unique_tracks_over_runs": 484,
+          "repeat_rate": 0.6773,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.3959,
+          "within_target_diversity": 2.2699,
+          "between_target_separation": 8.7762,
+          "random_eligible_list_diversity": 4.2672,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "calm": 1.8086
+          },
+          "unique_tracks_over_runs": 426,
+          "repeat_rate": 0.716,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.5559,
+          "within_target_diversity": 2.5419,
+          "between_target_separation": 8.8151,
+          "random_eligible_list_diversity": 4.2559,
+          "typicality_by_target": {
+            "calm": 1.8122,
+            "happy": 1.1439
+          },
+          "unique_tracks_over_runs": 314,
+          "repeat_rate": 0.7907,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.6409,
+          "within_target_diversity": 2.8483,
+          "between_target_separation": 8.6606,
+          "random_eligible_list_diversity": 4.3518,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "calm": 1.8063
+          },
+          "unique_tracks_over_runs": 428,
+          "repeat_rate": 0.7147,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3096,
+          "within_target_diversity": 2.7265,
+          "between_target_separation": 6.0214,
+          "random_eligible_list_diversity": 3.22,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "happy": 1.1367
+          },
+          "unique_tracks_over_runs": 469,
+          "repeat_rate": 0.6873,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "gates": null
+    },
+    "T: cells for base-label single-target, else G": {
+      "summary": {
+        "target_consistency": 1.0,
+        "exact_target_shares_all_lists": true,
+        "all_same_seed_identical": true,
+        "catalog_unique_tracks": 3020,
+        "mean_repeat_rate": 0.7123,
+        "mean_diversity": 3.9708,
+        "single_target_mean_diversity": 3.9708,
+        "single_target_requests_at_least_random_eligible": 10,
+        "requests_at_least_random_eligible": 10,
+        "mean_ranking_signal_of_served": 0.9888,
+        "single_target_mean_ranking_signal": 0.9888,
+        "latency_ms": {
+          "median": 2.92,
+          "p95": 5.69,
+          "max": 7.95
+        }
+      },
+      "latency": {
+        "first_call_in_run_ms": 2.79,
+        "steady_state": {
+          "calls": 611,
+          "median_ms": 2.92,
+          "p95_ms": 5.68,
+          "max_ms": 7.94
+        }
+      },
+      "speech_like_share": {
+        "per_request": {
+          "happy / match": 0.0,
+          "happy / uplift": 0.0053,
+          "sad / match": 0.0,
+          "sad / uplift": 0.0,
+          "angry / match": 0.002,
+          "angry / uplift": 0.0,
+          "chill / match": 0.0,
+          "chill / uplift": 0.0067,
+          "energetic / match": 0.0047,
+          "energetic / uplift": 0.0067,
+          "stressed / match": 0.0,
+          "stressed / uplift": 0.0
+        },
+        "calm_requests": 0.0
+      },
+      "relevance": {
+        "by_target": {
+          "sad": {
+            "slots": 1500,
+            "mean_probability": 0.9819,
+            "p5_probability": 0.8953,
+            "min_probability": 0.8152,
+            "classifier_agreement": 1.0
+          },
+          "happy": {
+            "slots": 4500,
+            "mean_probability": 0.9946,
+            "p5_probability": 0.9862,
+            "min_probability": 0.9532,
+            "classifier_agreement": 1.0
+          },
+          "energetic": {
+            "slots": 3950,
+            "mean_probability": 0.9876,
+            "p5_probability": 0.9406,
+            "min_probability": 0.8142,
+            "classifier_agreement": 1.0
+          },
+          "calm": {
+            "slots": 5050,
+            "mean_probability": 0.9992,
+            "p5_probability": 0.9961,
+            "min_probability": 0.9744,
+            "classifier_agreement": 1.0
+          }
+        },
+        "mean_probability": 0.993,
+        "classifier_agreement": 1.0,
+        "legacy_mean_probability_>=0.99": true
+      },
+      "shortfall_slots": {},
+      "configurations": {
+        "happy:30": {
+          "family": "single",
+          "requests": [
+            "happy / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 2.3836,
+          "within_target_diversity": 2.3836,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1331,
+          "typicality_by_target": {
+            "happy": 1.108
+          },
+          "unique_tracks_over_runs": 450,
+          "repeat_rate": 0.7,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "sad:30": {
+          "family": "single",
+          "requests": [
+            "sad / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.6335,
+          "within_target_diversity": 3.6335,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.3495,
+          "typicality_by_target": {
+            "sad": 1.4512
+          },
+          "unique_tracks_over_runs": 419,
+          "repeat_rate": 0.7207,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "angry:30": {
+          "family": "single",
+          "requests": [
+            "angry / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 3.2108,
+          "within_target_diversity": 3.2108,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.8899,
+          "typicality_by_target": {
+            "angry": 1.167
+          },
+          "unique_tracks_over_runs": 461,
+          "repeat_rate": 0.6927,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:30": {
+          "family": "single",
+          "requests": [
+            "chill / match",
+            "stressed / uplift"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.8438,
+          "within_target_diversity": 3.8438,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1579,
+          "typicality_by_target": {
+            "calm": 1.5933
+          },
+          "unique_tracks_over_runs": 411,
+          "repeat_rate": 0.726,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:30": {
+          "family": "single",
+          "requests": [
+            "energetic / match"
+          ],
+          "routed_to_cells": true,
+          "aliases_identical": true,
+          "list_diversity": 3.238,
+          "within_target_diversity": 3.238,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 3.1393,
+          "typicality_by_target": {
+            "energetic": 1.3299
+          },
+          "unique_tracks_over_runs": 448,
+          "repeat_rate": 0.7013,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "stressed:30": {
+          "family": "single",
+          "requests": [
+            "stressed / match"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 2.4342,
+          "within_target_diversity": 2.4342,
+          "between_target_separation": null,
+          "random_eligible_list_diversity": 2.85,
+          "typicality_by_target": {
+            "stressed": 0.8934
+          },
+          "unique_tracks_over_runs": 458,
+          "repeat_rate": 0.6947,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + energetic:11": {
+          "family": "multi",
+          "requests": [
+            "happy / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.1599,
+          "within_target_diversity": 2.3447,
+          "between_target_separation": 6.1228,
+          "random_eligible_list_diversity": 3.306,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "energetic": 1.69
+          },
+          "unique_tracks_over_runs": 484,
+          "repeat_rate": 0.6773,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "happy:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "sad / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.3959,
+          "within_target_diversity": 2.2699,
+          "between_target_separation": 8.7762,
+          "random_eligible_list_diversity": 4.2672,
+          "typicality_by_target": {
+            "happy": 1.1193,
+            "calm": 1.8086
+          },
+          "unique_tracks_over_runs": 426,
+          "repeat_rate": 0.716,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "calm:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "angry / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.5559,
+          "within_target_diversity": 2.5419,
+          "between_target_separation": 8.8151,
+          "random_eligible_list_diversity": 4.2559,
+          "typicality_by_target": {
+            "calm": 1.8122,
+            "happy": 1.1439
+          },
+          "unique_tracks_over_runs": 314,
+          "repeat_rate": 0.7907,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + calm:11": {
+          "family": "multi",
+          "requests": [
+            "chill / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 5.6409,
+          "within_target_diversity": 2.8483,
+          "between_target_separation": 8.6606,
+          "random_eligible_list_diversity": 4.3518,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "calm": 1.8063
+          },
+          "unique_tracks_over_runs": 428,
+          "repeat_rate": 0.7147,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        },
+        "energetic:19 + happy:11": {
+          "family": "multi",
+          "requests": [
+            "energetic / uplift"
+          ],
+          "routed_to_cells": false,
+          "aliases_identical": true,
+          "list_diversity": 4.3096,
+          "within_target_diversity": 2.7265,
+          "between_target_separation": 6.0214,
+          "random_eligible_list_diversity": 3.22,
+          "typicality_by_target": {
+            "energetic": 1.6264,
+            "happy": 1.1367
+          },
+          "unique_tracks_over_runs": 469,
+          "repeat_rate": 0.6873,
+          "target_consistency": 1.0,
+          "exact_target_shares_fraction": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "happy:30": {
+          "list_diversity": {
+            "mean": 0.2514,
+            "ci95": [
+              0.1996,
+              0.306
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.2514,
+            "ci95": [
+              0.2015,
+              0.3031
+            ]
+          }
+        },
+        "sad:30": {
+          "list_diversity": {
+            "mean": 2.2235,
+            "ci95": [
+              2.1596,
+              2.2849
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 2.2235,
+            "ci95": [
+              2.159,
+              2.2819
+            ]
+          }
+        },
+        "angry:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:30": {
+          "list_diversity": {
+            "mean": 1.1968,
+            "ci95": [
+              1.0843,
+              1.3092
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 1.1968,
+            "ci95": [
+              1.0781,
+              1.3098
+            ]
+          }
+        },
+        "energetic:30": {
+          "list_diversity": {
+            "mean": 0.3391,
+            "ci95": [
+              0.2668,
+              0.4062
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.3391,
+            "ci95": [
+              0.2737,
+              0.4129
+            ]
+          }
+        },
+        "stressed:30": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + energetic:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "happy:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "calm:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "energetic:19 + calm:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "energetic:19 + happy:11": {
+          "list_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "within_target_diversity": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "family_mean_change_vs_reference": {
+        "single": {
+          "mean": 0.6685,
+          "ci95": [
+            0.6439,
+            0.6913
+          ]
+        },
+        "multi": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "multi_within_diagnostic": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "gates": {
+        "integrity": "PASS",
+        "single_family_within_gain_lb_>0": "PASS",
+        ">=4_of_6_single_configs_within_gain_lb_>0": "PASS",
+        "no_single_config_regression": "PASS",
+        "multi_family_list_diversity_noninferior_lb_>-0.10": "PASS",
+        "each_multi_config_list_diversity_lb_>-0.25": "PASS",
+        "classifier_agreement_>=0.95": "PASS",
+        "mean_classifier_probability_>=0.95": "PASS",
+        "coverage_>=2000": "PASS",
+        "repeat_rate_<=0.75": "PASS",
+        "p95_latency_<=25ms": "PASS",
+        "calm_speech_like_<=0.20_and_<=production": "PASS"
+      }
+    }
+  },
+  "gate_decision_replicated": {
+    "integrity": true,
+    "single_family_within_gain_lb_>0": true,
+    ">=4_of_6_single_configs_within_gain_lb_>0": true,
+    "no_single_config_regression": true,
+    "multi_family_list_diversity_noninferior_lb_>-0.10": true,
+    "each_multi_config_list_diversity_lb_>-0.25": true,
+    "classifier_agreement_>=0.95": true,
+    "mean_classifier_probability_>=0.95": true,
+    "coverage_>=2000": true,
+    "repeat_rate_<=0.75": true,
+    "p95_latency_<=25ms": true,
+    "calm_speech_like_<=0.20_and_<=production": true
+  },
+  "cold_start_median_of_5_processes": {
+    "P: production": {
+      "cell_build_ms": 0.0,
+      "first_ms": 2.83,
+      "second_ms": 1.68,
+      "tenth_ms": 1.21
+    },
+    "G: production + calm guard": {
+      "cell_build_ms": 0.0,
+      "first_ms": 2.3,
+      "second_ms": 1.34,
+      "tenth_ms": 1.13
+    },
+    "T: cells for base-label single-target, else G": {
+      "cell_build_ms": 227.27,
+      "first_ms": 1.95,
+      "second_ms": 1.43,
+      "tenth_ms": 1.48
+    }
+  },
+  "notes": [
+    "Diversity is feature-space diversity, not listener-perceived variety.",
+    "Bootstrap intervals describe sampling variability over 50 seeded runs on one catalog only.",
+    "Latency is machine-dependent; T's cells are built once per catalog (cell_build_ms), not per request."
+  ],
+  "runtime_s": 82.2
+}

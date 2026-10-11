@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoodCast — Music</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+<style>
+  :root { --font-display: 'Sora', var(--font-sans); }
+
+  /* ---------- track list ---------- */
+  .playlist-head, .track-card {
+    display: grid; grid-template-columns: 28px 52px minmax(0, 1fr) 150px 52px auto;
+    column-gap: var(--space-4);
+  }
+  .playlist-head {
+    padding: 0 var(--space-4); margin-bottom: var(--space-2);
+    font: var(--text-micro); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--text-disabled);
+  }
+  .track-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+  .track-card {
+    align-items: center; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .track-card:hover, .track-card:focus-within {
+    background: var(--surface-glass-hover); border-color: color-mix(in srgb, var(--mood-a) 40%, var(--border-glass));
+  }
+  .track-idx { font: var(--text-body-sm); font-variant-numeric: tabular-nums; color: var(--text-disabled); text-align: center; }
+
+  .track-art { width: 52px; height: 52px; }
+  .track-cover, .track-cover-placeholder {
+    width: 52px; height: 52px; border-radius: var(--radius-sm); display: block; object-fit: cover;
+    box-shadow: 0 6px 16px -8px rgba(0,0,0,0.7);
+  }
+  .track-cover-placeholder {
+    display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: var(--text-primary);
+    background: var(--mood-gradient); opacity: 0.85;
+  }
+
+  .track-info { min-width: 0; }
+  .track-title {
+    font: var(--text-body); font-weight: 700; line-height: 1.3; color: var(--text-primary);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere;
+  }
+  .track-artist { font: var(--text-body-sm); color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .track-title.is-missing { font-weight: 600; color: var(--text-secondary); font-style: italic; }
+  .track-title.is-pending { color: var(--text-disabled); font-weight: 500; }
+  .track-artist.is-missing { color: var(--text-disabled); }
+
+  .track-match { min-width: 0; }
+  .match-bar-wrap { display: flex; align-items: center; gap: var(--space-2); }
+  .match-bar { flex: 1; }
+  .match-pct { font: var(--text-caption); font-weight: 700; color: var(--mood-glow); min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+  .match-none { color: var(--text-disabled); font: var(--text-caption); }
+  .track-duration { font: var(--text-caption); color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+
+  .track-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-1); }
+  .spotify-link {
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    font: var(--text-caption); font-weight: 700; color: var(--mood-text-on);
+    background: var(--mood-gradient); box-shadow: var(--glow-sm);
+    padding: 0.5rem 0.9rem; border-radius: var(--radius-full); margin-right: var(--space-2);
+    text-decoration: none; transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+  }
+  .spotify-link:hover { transform: translateY(-1px); box-shadow: var(--glow-md); }
+  .spotify-missing { font: var(--text-caption); color: var(--text-disabled); white-space: nowrap; margin-right: var(--space-2); }
+  .track-action-btn {
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid transparent;
+    background: transparent; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--dur-fast), border-color var(--dur-fast); opacity: 0.75;
+  }
+  .track-action-btn:hover, .track-action-btn:focus-visible { opacity: 1; background: var(--surface-glass-hover); border-color: var(--border-glass); }
+  .track-action-btn.is-fav { opacity: 1; }
+
+  .track-explain { grid-column: 1 / -1; display: none; }
+  .track-explain.open { display: block; margin-top: var(--space-3); }
+  .explain-inner { padding: var(--space-4) var(--space-5); }
+  .explain-head { font: var(--text-body-sm); font-weight: 700; margin-bottom: var(--space-3); }
+  .explain-bars { display: flex; flex-direction: column; gap: var(--space-3); }
+  .explain-bar-row { display: grid; grid-template-columns: 130px minmax(0, 1fr) 32px; align-items: center; gap: var(--space-3); }
+  .explain-bar-label { font: var(--text-caption); color: var(--text-secondary); }
+  .explain-bar-track { height: 6px; }
+  .explain-bar-value { font: var(--text-caption); font-weight: 700; color: var(--text-tertiary); text-align: right; }
+  .explain-note { font: var(--text-caption); color: var(--text-disabled); margin-top: var(--space-3); }
+
+  .track-skeleton { height: 76px; border-radius: var(--radius-md); }
+
+  /* ---------- Popular Artists ON/OFF switch (one control, under the mood/mode controls) ---------- */
+  .popular-row { display: flex; margin: calc(var(--space-3) - var(--space-6)) 0 var(--space-6); }
+  .popular-switch {
+    display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px;
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2); border-radius: var(--radius-full);
+    border: 1px solid var(--border-glass); background: var(--surface-glass); color: var(--text-secondary);
+    font: var(--text-body-sm); font-weight: 600; cursor: pointer;
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .popular-switch:hover { background: var(--surface-glass-hover); }
+  .popular-switch:focus-visible { outline: 2px solid var(--mood-glow); outline-offset: 2px; }
+  .switch-track {
+    position: relative; flex-shrink: 0; width: 44px; height: 24px; border-radius: var(--radius-full);
+    background: var(--surface-glass-strong); border: 1px solid var(--border-glass);
+    transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  .switch-thumb {
+    position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--text-tertiary); box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .switch-label { color: var(--text-primary); }
+  .switch-state {
+    min-width: 2.2em; font: var(--text-micro); font-weight: 700; text-transform: uppercase;
+    letter-spacing: var(--tracking-wide); color: var(--text-disabled);
+  }
+  .popular-switch[aria-checked="true"] {
+    border-color: var(--mood-glow); background: color-mix(in srgb, var(--mood-glow) 14%, var(--surface-glass));
+  }
+  .popular-switch[aria-checked="true"] .switch-track { background: var(--mood-gradient); border-color: transparent; }
+  .popular-switch[aria-checked="true"] .switch-thumb { transform: translateX(20px); background: #fff; }
+  .popular-switch[aria-checked="true"] .switch-state { color: var(--mood-glow); }
+  @media (prefers-reduced-motion: reduce) {
+    .switch-thumb, .switch-track, .popular-switch { transition: none; }
+  }
+  .source-note { font: var(--text-caption); color: var(--text-disabled); margin-top: var(--space-6); }
+
+  @media (max-width: 960px) {
+    .playlist-head { display: none; }
+    .track-card { grid-template-columns: 24px 48px minmax(0, 1fr) auto; row-gap: var(--space-2); }
+    .track-art, .track-cover, .track-cover-placeholder { width: 48px; height: 48px; }
+    .track-match, .track-duration { display: none; }
+  }
+  @media (max-width: 600px) {
+    .track-card { grid-template-columns: 44px minmax(0, 1fr); padding: var(--space-3); column-gap: var(--space-3); }
+    .track-idx { display: none; }
+    .track-art, .track-cover, .track-cover-placeholder { width: 44px; height: 44px; }
+    .track-title { font-size: 0.875rem; }
+    .track-actions { grid-column: 1 / -1; justify-content: flex-start; }
+    .explain-bar-row { grid-template-columns: 104px minmax(0, 1fr) 28px; }
+    .popular-switch { width: 100%; }
+  }
+</style>
+</head>
+<body class="ripple-host">
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="aurora-vignette"></div>
+<div class="aurora-grain"></div>
+<canvas id="particles"></canvas>
+
+<nav class="navbar glass">
+  <a href="/" class="logo"><div class="logo-mark">🎭</div> MoodCast</a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/music" class="active">Music</a>
+    <a href="/movies">Movies</a>
+    <a href="/dashboard">Dashboard</a>
+  </nav>
+</nav>
+
+<main id="main" class="page-main">
+  <header class="page-head">
+    <div>
+      <p class="page-kicker" id="pageKicker">🎵 Music</p>
+      <h1 class="page-title" id="pageTitle">Loading…</h1>
+      <p class="page-sub">Tracks ranked by MoodCast's mood model from their audio features. Open any song on Spotify to listen &mdash; nothing plays here.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn btn-glass btn-refresh" id="refreshBtn" aria-busy="false">
+        <span class="refresh-icon" aria-hidden="true">↻</span> Refresh recommendations
+      </button>
+    </div>
+  </header>
+
+  <div class="control-bar glass">
+    <div class="mood-strip" id="moodStrip" role="group" aria-label="Mood"></div>
+    <div class="input-pill-group" id="modeToggle" role="group" aria-label="Recommendation mode">
+      <button type="button" data-mode="match" class="active">Match my mood</button>
+      <button type="button" data-mode="uplift">Cheer me up</button>
+    </div>
+  </div>
+
+  <div class="popular-row">
+    <!-- one ON/OFF switch: OFF = normal recommendations, ON = Popular Artists; state set by music.js -->
+    <button type="button" class="popular-switch" id="popularSwitch" role="switch" aria-checked="false"
+            aria-labelledby="popularLabel" data-state="off">
+      <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+      <span class="switch-label" id="popularLabel">Popular Artists</span>
+      <span class="switch-state" aria-hidden="true">Off</span>
+    </button>
+  </div>
+
+  <p class="status-line" id="statusLine" aria-live="polite"></p>
+
+  <div class="playlist-head" aria-hidden="true">
+    <span>#</span><span></span><span>Track</span><span>Mood match</span><span>Time</span><span></span>
+  </div>
+  <div class="track-list" id="trackList" role="list" aria-label="Recommended tracks" aria-busy="true"></div>
+
+  <p class="source-note" id="sourceNote">Titles and artists come from a local dataset matched by Spotify track ID; for tracks it doesn't cover, the title and cover come from Spotify's public oEmbed service, which doesn't provide the artist.</p>
+</main>
+
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+<script src="{{ url_for('static', filename='js/ui-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mood-theme.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mood-history.js') }}"></script>
+<script src="{{ url_for('static', filename='js/landing-effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/track-identity.js') }}"></script>
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/music.js') }}"></script>
+<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+<script src="{{ url_for('static', filename='js/polish.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+# Hash-pinned files: check out the exact committed (LF) bytes on every platform,
+# so the SHA-256 values recorded in models/*.json match a fresh clone.
+data/**/*.csv -text
+src/recommend.py -text

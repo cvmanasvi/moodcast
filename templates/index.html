@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoodCast — Music &amp; movies for your mood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+<style>
+  :root { --font-display: 'Sora', var(--font-sans); }
+  html { --mood-transition: background var(--dur-slow) var(--ease-in-out); }
+
+  main { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding: 0 var(--space-6) var(--space-12); }
+
+  /* ---------- hero: intro + mood picker side by side ---------- */
+  .home-hero {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--space-6) var(--space-8);
+    grid-template-areas: "intro picker" "describe picker";
+    align-items: start; padding: var(--space-10) 0 var(--space-8);
+  }
+  .home-intro { grid-area: intro; }
+  .picker { grid-area: picker; }
+  .describe { grid-area: describe; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: 0.35rem 0.85rem; border-radius: var(--radius-full);
+    font: var(--text-caption); color: var(--text-secondary);
+  }
+  .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mood-glow); box-shadow: 0 0 10px var(--mood-glow); }
+  .home-intro h1 {
+    font: 700 clamp(2.1rem, 1.6rem + 2vw, 3.3rem) / 1.06 var(--font-display);
+    letter-spacing: var(--tracking-tight); margin: var(--space-4) 0 var(--space-3);
+  }
+  .home-intro h1 .accent { background: var(--mood-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .home-intro .sub { font: var(--text-body-lg); color: var(--text-tertiary); max-width: 460px; margin: 0; }
+
+  .describe { padding: var(--space-5); border-radius: var(--radius-lg); }
+  .describe label { display: block; font: var(--text-body-sm); font-weight: 700; margin-bottom: var(--space-1); }
+  .describe .hint { font: var(--text-caption); color: var(--text-tertiary); margin: 0 0 var(--space-3); }
+  .describe textarea { min-height: 4.5rem; }
+  .describe-actions { display: flex; justify-content: flex-end; margin-top: var(--space-3); }
+
+  .analysis-panel { margin-top: var(--space-4); display: none; }
+  .analysis-panel.show { display: block; animation: fade-up var(--dur-base) var(--ease-out) both; }
+  .analysis-step { display: flex; align-items: center; gap: var(--space-3); font: var(--text-body-sm); color: var(--text-secondary); }
+  .analysis-result { display: none; align-items: center; gap: var(--space-4); }
+  .analysis-result.show { display: flex; }
+  .analysis-result .emoji { font-size: 2.2rem; }
+  .analysis-result .meta { flex: 1; min-width: 0; }
+  .analysis-result .mood-name-big { font: var(--text-h4); margin-bottom: var(--space-2); }
+  .analysis-result .conf-label { font: var(--text-caption); color: var(--text-tertiary); margin-top: var(--space-2); display: flex; justify-content: space-between; }
+  .analysis-result .analysis-note { font: var(--text-caption); color: var(--text-secondary); margin: var(--space-2) 0 0; }
+  .analysis-result.is-uncertain .progress-glow-fill { opacity: 0.45; }
+
+  /* ---------- picker panel ---------- */
+  .picker { padding: var(--space-6); border-radius: var(--radius-xl); }
+  .step-label {
+    display: flex; align-items: center; gap: var(--space-2);
+    font: var(--text-micro); font-weight: 800; text-transform: uppercase; letter-spacing: var(--tracking-widest);
+    color: var(--text-tertiary); margin: 0 0 var(--space-3);
+  }
+  .step-label .num {
+    width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--mood-gradient); color: var(--mood-text-on); font-size: 11px; letter-spacing: 0;
+  }
+  .step + .step { margin-top: var(--space-6); }
+
+  .mood-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+  .mood-card {
+    position: relative; display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);
+    border: 1px solid var(--border-glass); background: var(--surface-glass);
+    color: var(--text-primary); text-align: left; cursor: pointer; font: inherit;
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .mood-card:hover { background: var(--surface-glass-hover); transform: translateY(-1px); }
+  .mood-card.selected {
+    border-color: var(--card-glow);
+    background: color-mix(in srgb, var(--card-glow) 16%, var(--surface-glass));
+    box-shadow: 0 0 0 1px var(--card-glow), 0 10px 30px -14px var(--card-glow);
+  }
+  .mood-emoji { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+  .mood-text { min-width: 0; }
+  .mood-name { display: block; font: var(--text-body-sm); font-weight: 700; }
+  .mood-vibe { display: block; font: var(--text-caption); color: var(--text-tertiary); }
+  .mood-check {
+    position: absolute; top: 8px; right: 8px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--card-glow); color: #06050a; font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.6);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .mood-card.selected .mood-check { opacity: 1; transform: none; }
+
+  .mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .mode-option {
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); cursor: pointer; text-align: left;
+    border: 1px solid var(--border-glass); background: var(--surface-glass); color: var(--text-primary); font: inherit;
+    transition: border-color var(--dur-base), background var(--dur-base);
+  }
+  .mode-option strong { display: block; font: var(--text-body-sm); font-weight: 700; }
+  .mode-option span { font: var(--text-caption); color: var(--text-tertiary); }
+  .mode-option.active { border-color: var(--mood-a); background: color-mix(in srgb, var(--mood-a) 16%, var(--surface-glass)); box-shadow: 0 0 0 1px var(--mood-a); }
+
+  .cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .cta-grid .btn { justify-content: center; width: 100%; }
+
+  /* ---------- feature strip ---------- */
+  .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+  .feature {
+    display: block; padding: var(--space-5); border-radius: var(--radius-lg); color: var(--text-primary);
+    transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-base);
+  }
+  .feature:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--mood-a) 40%, var(--border-glass)); }
+  .feature .icon { font-size: 1.4rem; }
+  .feature h2 { font: var(--text-h4); margin: var(--space-2) 0 var(--space-1); }
+  .feature p { font: var(--text-body-sm); color: var(--text-tertiary); margin: 0; }
+  .feature .go { display: inline-block; margin-top: var(--space-3); font: var(--text-caption); font-weight: 700; color: var(--mood-glow); }
+
+  footer { text-align: center; padding: var(--space-8) var(--space-4) var(--space-6); font: var(--text-caption); color: var(--text-disabled); position: relative; z-index: 2; }
+
+  @media (max-width: 960px) {
+    .home-hero { grid-template-columns: 1fr; grid-template-areas: "intro" "picker" "describe"; padding-top: var(--space-6); }
+    .home-intro .sub { max-width: none; }
+  }
+  @media (max-width: 600px) {
+    main { padding: 0 var(--space-4) var(--space-10); }
+    .picker { padding: var(--space-4); }
+    .mood-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .features { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 380px) {
+    .mode-options, .cta-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="ripple-host">
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="aurora-vignette"></div>
+<div class="aurora-grain"></div>
+<canvas id="particles"></canvas>
+<div class="cursor-spotlight" id="cursorSpotlight"></div>
+
+<nav class="navbar glass">
+  <a href="/" class="logo"><div class="logo-mark">🎭</div> MoodCast</a>
+  <nav>
+    <a href="/" class="active">Home</a>
+    <a href="/music">Music</a>
+    <a href="/movies">Movies</a>
+    <a href="/dashboard">Dashboard</a>
+  </nav>
+</nav>
+
+<main id="main">
+  <section class="home-hero">
+    <div class="home-intro animate-fade-up">
+      <div class="eyebrow glass"><span class="dot"></span> Mood-aware music &amp; movie discovery</div>
+      <h1>How are you<br><span class="accent">feeling today?</span></h1>
+      <p class="sub">Pick a mood or describe your day. MoodCast's trained models find songs and films that match it &mdash; or lift you out of it.</p>
+
+    </div>
+
+    <div class="describe glass">
+      <label for="moodText">Describe your day</label>
+      <p class="hint">A trained text classifier detects your mood and selects it for you.</p>
+      <textarea class="textarea" id="moodText" placeholder="e.g. work has been a nightmare and I can barely breathe…"></textarea>
+      <div class="describe-actions">
+        <button type="button" class="btn btn-glass" id="analyzeBtn">✨ Detect my mood</button>
+      </div>
+      <div class="analysis-panel" id="analysisPanel" aria-live="polite">
+        <div class="analysis-step" id="analysisStep">
+          <span class="spinner spinner-sm"></span>
+          <span id="analysisStepText">Reading emotion…</span>
+        </div>
+        <div class="analysis-result" id="analysisResult">
+          <span class="emoji" id="analysisEmoji">😊</span>
+          <div class="meta">
+            <div class="mood-name-big" id="analysisMoodName">Happy</div>
+            <div class="progress-glow"><div class="progress-glow-fill" id="analysisConfFill" style="width:0%"></div></div>
+            <div class="conf-label"><span>Classifier confidence</span><span id="analysisConfLabel">0%</span></div>
+            <p class="analysis-note" id="analysisNote" hidden>The model isn't sure about this one &mdash; pick a mood below if this isn't right.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="picker glass-strong animate-fade-up">
+      <div class="step">
+        <p class="step-label"><span class="num">1</span> Pick a mood</p>
+        <div class="mood-grid" id="moodGrid" role="group" aria-label="Mood"></div>
+      </div>
+      <div class="step">
+        <p class="step-label"><span class="num">2</span> Choose how</p>
+        <div class="mode-options" id="modeToggle" role="group" aria-label="Recommendation mode">
+          <button type="button" class="mode-option active" data-mode="match"><strong>🎯 Match my mood</strong><span>Picks that fit how you feel</span></button>
+          <button type="button" class="mode-option" data-mode="uplift"><strong>🌤️ Cheer me up</strong><span>Picks that lift you toward a better mood</span></button>
+        </div>
+      </div>
+      <div class="step">
+        <p class="step-label"><span class="num">3</span> Discover</p>
+        <div class="cta-grid">
+          <a class="btn btn-primary btn-lg" href="/music">🎵 Find music</a>
+          <a class="btn btn-glass btn-lg" href="/movies">🎬 Find movies</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" aria-label="What MoodCast offers">
+    <a class="feature glass" href="/music">
+      <span class="icon" aria-hidden="true">🎵</span>
+      <h2>Music</h2>
+      <p>277,938 tracks ranked by a mood model trained on audio features. Every song opens on Spotify.</p>
+      <span class="go">Open Music →</span>
+    </a>
+    <a class="feature glass" href="/movies">
+      <span class="icon" aria-hidden="true">🎬</span>
+      <h2>Movies</h2>
+      <p>12,586 films scored by plot and genre. Flip a poster for the storyline, rating and where to watch in India.</p>
+      <span class="go">Open Movies →</span>
+    </a>
+    <a class="feature glass" href="/dashboard">
+      <span class="icon" aria-hidden="true">📊</span>
+      <h2>Dashboard</h2>
+      <p>Your mood history, quick previews and a "Surprise me" pick from outside your usual moods.</p>
+      <span class="go">Open Dashboard →</span>
+    </a>
+  </section>
+</main>
+
+<footer>MoodCast — mood-based music and movie recommendations</footer>
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+<script src="{{ url_for('static', filename='js/ui-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mood-theme.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mood-history.js') }}"></script>
+<script src="{{ url_for('static', filename='js/landing-effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/track-identity.js') }}"></script>
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+<script src="{{ url_for('static', filename='js/polish.js') }}"></script>
+<script>
+initParticles(document.getElementById('particles'));
+initCursorSpotlight(document.getElementById('cursorSpotlight'));
+
+// Short, descriptive UI copy for each mood (not data about any song or film).
+const MOOD_VIBE = {
+  happy: 'Upbeat & bright', sad: 'Slow & reflective', angry: 'Loud & intense',
+  chill: 'Calm & easy', energetic: 'Fast & driving', stressed: 'Tense, or unwind',
+};
+
+const moodGrid = document.getElementById('moodGrid');
+MOOD_ORDER.forEach((id) => {
+  const theme = MOOD_THEME[id];
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'mood-card';
+  card.style.setProperty('--card-glow', theme.colors.glow);
+  card.dataset.moodSelect = id;
+  card.innerHTML = `
+    <span class="mood-check" aria-hidden="true">✓</span>
+    <span class="mood-emoji" aria-hidden="true">${theme.emoji}</span>
+    <span class="mood-text"><span class="mood-name">${theme.label}</span><span class="mood-vibe">${MOOD_VIBE[id] || ''}</span></span>
+  `;
+  card.addEventListener('click', () => setMoodTheme(id));
+  moodGrid.appendChild(card);
+});
+
+function syncSelectedCard() {
+  const current = getCurrentMood();
+  document.querySelectorAll('.mood-card').forEach((c) => {
+    const on = c.dataset.moodSelect === current;
+    c.classList.toggle('selected', on);
+    c.setAttribute('aria-pressed', String(on));
+  });
+}
+syncSelectedCard();
+onMoodThemeChange(syncSelectedCard);
+
+const modeButtons = [...document.getElementById('modeToggle').querySelectorAll('button')];
+function syncMode() {
+  modeButtons.forEach((b) => {
+    const on = b.dataset.mode === getCurrentMode();
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+modeButtons.forEach((btn) => btn.addEventListener('click', () => { setMode(btn.dataset.mode); syncMode(); }));
+syncMode();
+
+async function runAnalysis() {
+  const text = document.getElementById('moodText').value.trim();
+  if (!text) {
+    showToast('Type something first');
+    return;
+  }
+  const panel = document.getElementById('analysisPanel');
+  const stepEl = document.getElementById('analysisStep');
+  const stepText = document.getElementById('analysisStepText');
+  const resultEl = document.getElementById('analysisResult');
+
+  panel.classList.add('show');
+  stepEl.style.display = 'flex';
+  resultEl.classList.remove('show');
+  document.getElementById('analyzeBtn').disabled = true;
+
+  stepText.textContent = 'Reading emotion…';
+  const detectPromise = fetch('/api/detect-mood', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  }).then(readJsonResponse);
+
+  await new Promise(r => setTimeout(r, 650));
+  stepText.textContent = 'Detecting mood…';
+  await new Promise(r => setTimeout(r, 650));
+
+  let data;
+  try {
+    data = await detectPromise;
+  } catch (err) {
+    stepEl.style.display = 'none';
+    showToast('Could not analyze — try again');
+    document.getElementById('analyzeBtn').disabled = false;
+    return;
+  }
+
+  if (data.error || !MOOD_THEME[data.mood]) {
+    stepEl.style.display = 'none';
+    showToast('Could not detect a mood from that');
+    document.getElementById('analyzeBtn').disabled = false;
+    return;
+  }
+
+  stepText.textContent = 'Scoring confidence…';
+  await new Promise(r => setTimeout(r, 400));
+  stepEl.style.display = 'none';
+
+  const theme = getMoodTheme(data.mood);
+  const confPct = Math.round((data.confidence || 0) * 100);
+  // `uncertain`: only the model's best guess (low confidence, or no words it knows)
+  const uncertain = data.uncertain === true;
+  document.getElementById('analysisEmoji').textContent = theme.emoji;
+  document.getElementById('analysisMoodName').textContent = uncertain ? `Not sure — maybe ${theme.label}?` : theme.label;
+  document.getElementById('analysisConfLabel').textContent = uncertain ? `Low · ${confPct}%` : confPct + '%';
+  document.getElementById('analysisNote').hidden = !uncertain;
+  resultEl.classList.toggle('is-uncertain', uncertain);
+  resultEl.classList.add('show');
+
+  requestAnimationFrame(() => {
+    document.getElementById('analysisConfFill').style.width = confPct + '%';
+  });
+
+  // This is the app's primary mood-detection entry point, so the
+  // confidence it produces needs to be persisted the same way the chat
+  // assistant's text detection does — otherwise the Dashboard's "Mood
+  // confidence" stat and summary card silently show nothing for most
+  // users, who use this box rather than the chat assistant.
+  setMoodTheme(data.mood, { confidence: data.confidence });
+  showToast(uncertain ? 'Best guess ' + theme.emoji + ' ' + theme.label + ' — change it below if needed'
+                      : 'Detected ' + theme.emoji + ' ' + theme.label);
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+
+</script>
+
+</body>
+</html>

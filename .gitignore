@@ -1,0 +1,81 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# =========================
+# Secrets / Environment
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Testing / Coverage
+# =========================
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.bak
+# =========================
+# External datasets (downloaded, never committed)
+# =========================
+data/external/
+# =========================
+# Generated local-only music metadata (see METADATA.md; never committed)
+# =========================
+data/metadata/
+# =========================
+# Generated listening-pilot reports (contain hashes of the private answer keys; regenerate locally)
+# =========================
+models/music_listening_pilot_pack.json
+models/music_listening_pilot_calm_supplement.json
+# =========================
+# Datasets and models not distributed with this repository (see DATA.md).
+# Each is provided or built locally; never commit them.
+# =========================
+data/music_dataset2/
+data/music_catalog_278k.csv
+models/music_mood_classifier_278k.pkl
+data/movie_dataset2/
+data/movies_final.csv
+data/movies_final_rulebased_backup.csv
+models/movie_mood_classifier.pkl
